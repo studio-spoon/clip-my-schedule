@@ -43,6 +43,7 @@ const Scheduler = () => {
     displayName: string;
     calendarId: string;
     accessRole: string;
+    source: 'self' | 'shared' | 'organization';
   }>>([]);
   const [isMembersLoading, setIsMembersLoading] = useState(false);
   const [membersError, setMembersError] = useState<string | null>(null);
@@ -93,7 +94,8 @@ const Scheduler = () => {
           name: session?.user?.name || 'あなた',
           displayName: `${session?.user?.name || 'あなた'} (${session?.user?.email || 'user@example.com'})`,
           calendarId: session?.user?.email || 'user@example.com',
-          accessRole: 'owner'
+          accessRole: 'owner',
+          source: 'self' as const
         }
       ];
       setTeamMembers(fallbackMembers);
@@ -528,7 +530,7 @@ const Scheduler = () => {
                     参加者を選択
                   </h2>
                   <span className='text-sm text-gray-500 dark:text-gray-400'>
-                    {isMembersLoading ? '読み込み中...' : '共有済みカレンダーから'}
+                    {isMembersLoading ? '読み込み中...' : '組織メンバー・共有カレンダーから'}
                   </span>
                 </div>
                 <div className='bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600'>
@@ -566,9 +568,19 @@ const Scheduler = () => {
                           />
                           <span className='text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors'>
                             {member.displayName}
-                            {member.accessRole === 'owner' && (
+                            {member.source === 'self' && (
                               <span className='ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-1 rounded'>
                                 あなた
+                              </span>
+                            )}
+                            {member.source === 'organization' && (
+                              <span className='ml-2 text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 px-2 py-1 rounded'>
+                                組織
+                              </span>
+                            )}
+                            {member.source === 'shared' && (
+                              <span className='ml-2 text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 px-2 py-1 rounded'>
+                                共有
                               </span>
                             )}
                           </span>
