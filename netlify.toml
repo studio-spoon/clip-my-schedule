@@ -1,0 +1,22 @@
+# netlify.toml - Netlify configuration for Next.js
+
+[build]
+  # Next.js build command
+  command = "npx next build"
+  # Next.js output directory
+  publish = ".next"
+
+[[plugins]]
+  # Essential plugin for Next.js on Netlify
+  # Handles SSR, ISR, API routes automatically
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  # Node.js version for build
+  NODE_VERSION = "18"
+  
+# Redirect configuration for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
