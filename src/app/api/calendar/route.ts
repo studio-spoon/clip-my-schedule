@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET(request: NextRequest) {
   try {
     // セッション確認
-    const session = await getServerSession()
+    const session = await getServerSession() as any
     
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -39,9 +39,13 @@ export async function GET(request: NextRequest) {
           },
         })
         
+        const busyPeriods = response.data.calendars?.[email]?.busy || []
         return {
           email,
-          busy: response.data.calendars?.[email]?.busy || [],
+          busy: busyPeriods.map((period: any) => ({
+            start: period.start || '',
+            end: period.end || ''
+          })).filter((period: any) => period.start && period.end),
         }
       } catch (error) {
         console.error(`Error fetching calendar for ${email}:`, error)

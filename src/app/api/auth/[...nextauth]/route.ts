@@ -1,7 +1,7 @@
-import NextAuth, { NextAuthOptions } from "next-auth"
+import NextAuth from "next-auth/next"
 import GoogleProvider from "next-auth/providers/google"
 
-const authOptions: NextAuthOptions = {
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -50,7 +50,7 @@ const authOptions: NextAuthOptions = {
     error: "/", // エラー時もメインページにリダイレクト
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
 }
 
