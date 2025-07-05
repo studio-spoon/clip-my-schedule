@@ -10,6 +10,7 @@ import AppHeader from '@/components/AppHeader';
 import MemberSelection from '@/components/MemberSelection';
 import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleResults from '@/components/ScheduleResults';
+import DebugPanel from '@/components/DebugPanel';
 
 function SchedulerContent() {
   // NextAuth.jsセッション管理
@@ -18,9 +19,9 @@ function SchedulerContent() {
   const isAuthenticated = status === 'authenticated';
 
   // カスタムフック
-  const { teamMembers, isLoading: isMembersLoading, error: membersError, refetch: refetchMembers } = useMembers();
+  const { teamMembers, isLoading: isMembersLoading, error: membersError, refetch: refetchMembers, addManualMember } = useMembers();
   const scheduleState = useScheduleState();
-  const { availableSlots, isSearching, searchSchedule } = useScheduleSearch();
+  const { availableSlots, isSearching, hasSearched, searchSchedule } = useScheduleSearch();
 
   // セッション初期化
   useEffect(() => {
@@ -48,6 +49,34 @@ function SchedulerContent() {
       selectedPeriod: scheduleState.selectedPeriod,
       teamMembers
     });
+  };
+
+  // 設定変更時の自動再検索
+  useEffect(() => {
+    if (hasSearched && scheduleState.selectedMembers.length > 0) {
+      const timeoutId = setTimeout(() => {
+        handleSearch();
+      }, 500); // 500ms の debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    scheduleState.selectedMembers,
+    scheduleState.selectedPeriod,
+    scheduleState.selectedTimeSlot,
+    scheduleState.customTimeStart,
+    scheduleState.customTimeEnd,
+    scheduleState.meetingDuration,
+    scheduleState.bufferTime,
+    scheduleState.customDuration,
+    hasSearched
+  ]);
+
+  const handleAddMember = async (member: any) => {
+    // 新しいメンバーをローカルに追加
+    if (member.email) {
+      await addManualMember(member.email);
+    }
   };
 
 
@@ -89,6 +118,8 @@ function SchedulerContent() {
                 error={membersError}
                 onMemberToggle={scheduleState.handleMemberToggle}
                 onRetry={refetchMembers}
+                onAddMember={handleAddMember}
+                userEmail={session?.user?.email || null}
               />
               
               <ScheduleForm
@@ -99,6 +130,8 @@ function SchedulerContent() {
                 meetingDuration={scheduleState.meetingDuration}
                 bufferTime={scheduleState.bufferTime}
                 customDuration={scheduleState.customDuration}
+                isSearching={isSearching}
+                hasSearched={hasSearched}
                 onPeriodChange={scheduleState.setSelectedPeriod}
                 onTimeSlotChange={scheduleState.setSelectedTimeSlot}
                 onCustomTimeStartChange={scheduleState.setCustomTimeStart}
@@ -123,6 +156,11 @@ function SchedulerContent() {
           </div>
         </div>
       </div>
+      
+      {/* Debug Panel (開発環境のみ) */}
+      {process.env.NODE_ENV === 'development' && (
+        <DebugPanel teamMembers={teamMembers} />
+      )}
     </div>
   );
 }

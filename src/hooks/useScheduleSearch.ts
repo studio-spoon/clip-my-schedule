@@ -18,6 +18,7 @@ interface ScheduleSlot {
 export function useScheduleSearch() {
   const [availableSlots, setAvailableSlots] = useState<ScheduleSlot[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
   // サンプル空き時間データ（フォールバック用）
   const sampleAvailableSlots: ScheduleSlot[] = [
@@ -79,6 +80,7 @@ export function useScheduleSearch() {
         }))
         
         setAvailableSlots(formattedSlots)
+        setHasSearched(true)
       } else {
         throw new Error(result.error || 'カレンダー情報の取得に失敗しました')
       }
@@ -86,6 +88,7 @@ export function useScheduleSearch() {
       console.error('検索エラー:', error)
       alert('カレンダー情報の取得に失敗しました。サンプルデータを表示します。')
       setAvailableSlots(sampleAvailableSlots)
+      setHasSearched(true)
     } finally {
       setIsSearching(false)
     }
@@ -93,11 +96,13 @@ export function useScheduleSearch() {
 
   const clearResults = () => {
     setAvailableSlots([])
+    setHasSearched(false)
   }
 
   return {
     availableSlots,
     isSearching,
+    hasSearched,
     searchSchedule,
     clearResults
   }

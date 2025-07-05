@@ -51,6 +51,13 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<ApiRes
 export const membersApi = {
   async getMembers(): Promise<ApiResponse<MembersResult>> {
     return apiRequest<MembersResult>('/api/members')
+  },
+
+  async addMember(email: string): Promise<ApiResponse<{ member: Member }>> {
+    return apiRequest<{ member: Member }>('/api/members/add', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    })
   }
 }
 

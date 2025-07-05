@@ -2,10 +2,8 @@
 
 import { Calendar, LogOut, Sun, Moon, Monitor } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
-import type { Session } from 'next-auth'
-
 interface AppHeaderProps {
-  session: Session | null
+  session: any
   onLogout: () => void
 }
 

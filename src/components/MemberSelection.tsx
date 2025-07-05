@@ -1,7 +1,9 @@
 'use client'
 
 import { Users } from 'lucide-react'
+import { useState } from 'react'
 import type { Member } from '@/types/api'
+import AddMemberForm from '@/components/AddMemberForm'
 
 interface MemberSelectionProps {
   teamMembers: Member[]
@@ -10,6 +12,8 @@ interface MemberSelectionProps {
   error: string | null
   onMemberToggle: (member: string) => void
   onRetry: () => void
+  onAddMember?: (member: Member) => void
+  userEmail?: string | null
 }
 
 export default function MemberSelection({
@@ -18,8 +22,38 @@ export default function MemberSelection({
   isLoading,
   error,
   onMemberToggle,
-  onRetry
+  onRetry,
+  onAddMember,
+  userEmail
 }: MemberSelectionProps) {
+  const [addMemberError, setAddMemberError] = useState<string | null>(null)
+  
+  const userDomain = userEmail?.split('@')[1] || ''
+  const organizationMembers = teamMembers.filter(m => m.source === 'organization')
+  
+  const handleAddMember = async (email: string) => {
+    setAddMemberError(null)
+    
+    try {
+      // 簡単なメンバー情報を作成
+      const member = {
+        email,
+        name: email.split('@')[0],
+        displayName: `${email.split('@')[0]} (${email})`,
+        calendarId: email,
+        accessRole: 'organization',
+        source: 'organization' as const
+      }
+      
+      if (onAddMember) {
+        onAddMember(member)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '不明なエラー'
+      setAddMemberError(errorMessage)
+      throw error
+    }
+  }
   return (
     <div className='mb-8'>
       <div className='flex items-center gap-3 mb-4'>
@@ -46,6 +80,26 @@ export default function MemberSelection({
             >
               再試行
             </button>
+          </div>
+        )}
+        
+        {/* 組織メンバーが少ない場合の手動追加機能 */}
+        {userDomain && organizationMembers.length === 0 && !isLoading && onAddMember && (
+          <div className='mb-4'>
+            <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4'>
+              <p className='text-sm text-blue-800 dark:text-blue-200 mb-3'>
+                💡 組織メンバーが自動検出されませんでした。手動で追加できます。
+              </p>
+              <AddMemberForm 
+                onAddMember={handleAddMember}
+                userDomain={userDomain}
+              />
+              {addMemberError && (
+                <div className='mt-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-800 dark:text-red-200'>
+                  ❌ {addMemberError}
+                </div>
+              )}
+            </div>
           </div>
         )}
         

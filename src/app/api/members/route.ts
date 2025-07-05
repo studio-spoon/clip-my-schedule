@@ -77,23 +77,32 @@ export async function GET(request: NextRequest) {
 
     // 2. 組織内メンバーを取得（同じドメインのユーザー）
     const userDomain = session.user.email.split('@')[1]
+    console.log(`Attempting to fetch organization users for domain: ${userDomain}`)
+    
     if (userDomain) {
       try {
+        // まず、現在のユーザーの権限を確認
+        console.log('Testing Admin SDK access...')
+        
         // Google Workspace組織内のユーザーを取得
         const orgUsersResponse = await admin.users.list({
           domain: userDomain,
-          maxResults: 100, // 最大100名まで取得
-          projection: 'basic',
-          query: 'isAdmin=false OR isAdmin=true' // 全ユーザーを取得
+          maxResults: 10, // まずは10名で試す
+          projection: 'basic'
         })
 
         const orgUsers = orgUsersResponse.data.users || []
         
-        console.log(`Found ${orgUsers.length} organization users for domain: ${userDomain}`)
+        console.log(`✅ Successfully found ${orgUsers.length} organization users for domain: ${userDomain}`)
+        console.log('Organization users sample:', orgUsers.slice(0, 3).map(u => ({
+          email: u.primaryEmail,
+          name: u.name?.fullName,
+          suspended: u.suspended
+        })))
 
         // 組織内メンバーを追加
         for (const user of orgUsers) {
-          if (user.primaryEmail && user.primaryEmail !== session.user.email) {
+          if (user.primaryEmail && user.primaryEmail !== session.user.email && !user.suspended) {
             // 既に追加されているユーザーをスキップ
             const existingMember = members.find(m => m.email === user.primaryEmail)
             if (!existingMember) {
@@ -107,20 +116,81 @@ export async function GET(request: NextRequest) {
                 accessRole: 'organization',
                 source: 'organization'
               })
+              
+              console.log(`Added organization member: ${displayName} (${user.primaryEmail})`)
             }
           }
         }
       } catch (error: any) {
-        console.error('Error fetching organization users:', {
+        console.error('❌ Error fetching organization users:', {
           message: error.message,
           status: error.status,
-          domain: userDomain
+          code: error.code,
+          domain: userDomain,
+          details: error.details || error.response?.data
         })
         
-        // Directory API のアクセス権限がない場合のログ
-        if (error.status === 403) {
-          console.log('Directory API access denied - user may not have admin permissions or domain may not be a Google Workspace domain')
+        // Directory API のアクセス権限がない場合の詳細ログ
+        if (error.status === 403 || error.code === 403) {
+          console.log('🔒 Directory API access denied. Possible reasons:')
+          console.log('1. User does not have admin permissions')
+          console.log('2. Domain is not a Google Workspace domain')
+          console.log('3. Admin SDK API is not enabled for this project')
+          console.log('4. OAuth consent screen needs Admin Directory API scope approval')
         }
+        
+        if (error.status === 400 || error.code === 400) {
+          console.log('❌ Bad request - Domain may not exist or invalid format')
+        }
+      }
+    }
+
+    // 3. 代替方法：Google People API (Contacts) から組織メンバーを取得
+    if (userDomain && members.filter(m => m.source === 'organization').length === 0) {
+      try {
+        console.log('🔄 Trying alternative approach with People API...')
+        
+        const people = google.people({ version: 'v1', auth: oauth2Client })
+        
+        // コンタクトから同じドメインのユーザーを取得
+        const connections = await people.people.connections.list({
+          resourceName: 'people/me',
+          pageSize: 100,
+          personFields: 'names,emailAddresses,organizations'
+        })
+
+        const contacts = connections.data.connections || []
+        console.log(`Found ${contacts.length} contacts via People API`)
+
+        // 同じドメインのコンタクトを抽出
+        for (const contact of contacts) {
+          if (contact.emailAddresses) {
+            for (const emailAddr of contact.emailAddresses) {
+              const email = emailAddr.value
+              if (email && email.includes(`@${userDomain}`) && email !== session.user.email) {
+                // 既に追加されているユーザーをスキップ
+                const existingMember = members.find(m => m.email === email)
+                if (!existingMember) {
+                  const name = contact.names?.[0]?.displayName || email.split('@')[0]
+                  
+                  members.push({
+                    email: email,
+                    name: name,
+                    displayName: `${name} (${email})`,
+                    calendarId: email,
+                    accessRole: 'organization',
+                    source: 'organization'
+                  })
+                  
+                  console.log(`Added organization contact: ${name} (${email})`)
+                }
+              }
+            }
+          }
+        }
+      } catch (error: any) {
+        console.error('People API error:', error)
+        console.log('People API access may not be granted or contacts are empty')
       }
     }
 

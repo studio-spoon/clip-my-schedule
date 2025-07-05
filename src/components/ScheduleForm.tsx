@@ -10,6 +10,8 @@ interface ScheduleFormProps {
   meetingDuration: string
   bufferTime: string
   customDuration: string
+  isSearching?: boolean
+  hasSearched?: boolean
   onPeriodChange: (period: string) => void
   onTimeSlotChange: (slot: string) => void
   onCustomTimeStartChange: (time: string) => void
@@ -28,6 +30,8 @@ export default function ScheduleForm({
   meetingDuration,
   bufferTime,
   customDuration,
+  isSearching = false,
+  hasSearched = false,
   onPeriodChange,
   onTimeSlotChange,
   onCustomTimeStartChange,
@@ -191,11 +195,31 @@ export default function ScheduleForm({
       <div className='mb-8'>
         <button
           onClick={onSearch}
-          className='w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-3'
+          disabled={isSearching}
+          className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-3 ${
+            isSearching 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl'
+          }`}
         >
-          <Clock className='w-5 h-5' />
-          空き時間を検索
+          {isSearching ? (
+            <>
+              <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
+              検索中...
+            </>
+          ) : (
+            <>
+              <Clock className='w-5 h-5' />
+              {hasSearched ? '結果を更新' : '空き時間を検索'}
+            </>
+          )}
         </button>
+        
+        {hasSearched && !isSearching && (
+          <p className='text-sm text-gray-500 dark:text-gray-400 text-center mt-2'>
+            💡 設定を変更すると自動的に結果が更新されます
+          </p>
+        )}
       </div>
     </>
   )

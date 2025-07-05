@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 
 interface ScheduleResultsProps {
-  availableSlots: {date: string, times: string[]}[]
+  availableSlots?: {date: string, times: string[]}[]
   selectedMembers: string[]
   selectedPeriod: string
   selectedTimeSlot: string
@@ -25,6 +25,9 @@ export default function ScheduleResults({
   bufferTime
 }: ScheduleResultsProps) {
   const [isCopied, setIsCopied] = useState(false)
+  
+  // 安全なデフォルト値
+  const safeAvailableSlots = availableSlots || []
 
   const generateTextOutput = () => {
     const memberList = selectedMembers.join(', ')
@@ -41,7 +44,7 @@ export default function ScheduleResults({
     output += `前後隙間時間: ${bufferTime}\n\n`
     output += `【空き時間】\n`
 
-    availableSlots.forEach((slot) => {
+    safeAvailableSlots.forEach((slot) => {
       output += `${slot.date}\n`
       slot.times.forEach((time) => {
         output += `  ・${time}\n`
@@ -62,7 +65,7 @@ export default function ScheduleResults({
     }
   }
 
-  if (availableSlots.length === 0) {
+  if (safeAvailableSlots.length === 0) {
     return null
   }
 
@@ -78,7 +81,7 @@ export default function ScheduleResults({
           空き時間一覧
         </h4>
         <div className='space-y-4'>
-          {availableSlots.map((slot, index) => (
+          {safeAvailableSlots.map((slot, index) => (
             <div
               key={index}
               className='bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700'
