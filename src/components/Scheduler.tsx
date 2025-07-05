@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import {
   Calendar,
   Clock,
@@ -16,16 +17,10 @@ import {
 } from 'lucide-react';
 
 const Scheduler = () => {
-  // 認証状態
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{
-    id: string;
-    name: string;
-    email: string;
-    picture: string;
-    domain: string;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // NextAuth.jsセッション管理
+  const { data: session, status } = useSession();
+  const isLoading = status === 'loading';
+  const isAuthenticated = status === 'authenticated';
 
   // アプリケーション状態
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -41,28 +36,12 @@ const Scheduler = () => {
   const [theme, setTheme] = useState('system');
   const [isDark, setIsDark] = useState(false);
 
-  // 初期化時にログイン状態をチェック
+  // セッション初期化
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // 実際の実装では、ここでGoogle OAuth SDKを初期化
-        // 既存のセッションがあるかチェック
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-          const userData = JSON.parse(savedUser);
-          setUser(userData);
-          setIsAuthenticated(true);
-          setSelectedMembers([`${userData.name} (${userData.email})`]);
-        }
-      } catch (error) {
-        console.error('認証初期化エラー:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-  }, []);
+    if (session?.user) {
+      setSelectedMembers([`${session.user.name} (${session.user.email})`]);
+    }
+  }, [session]);
 
   // テーマ設定の初期化とシステム設定の監視
   useEffect(() => {
@@ -102,53 +81,16 @@ const Scheduler = () => {
     }
   };
 
-  // Google OAuth ログイン（実際の実装では Google OAuth SDK を使用）
-  const handleGoogleLogin = async () => {
-    try {
-      // デモ用のログインシミュレーション
-      // 実際の実装では：
-      // const response = await gapi.auth2.getAuthInstance().signIn();
-      // const profile = response.getBasicProfile();
-
-      setIsLoading(true);
-
-      // デモ用のユーザーデータ
-      const demoUser = {
-        id: 'demo123',
-        name: '中村明史',
-        email: 'nakamura@studio-spoon.co.jp',
-        picture: 'https://via.placeholder.com/40x40/4F46E5/FFFFFF?text=N',
-        domain: 'studio-spoon.co.jp',
-      };
-
-      // studio-spoon.co.jp ドメインのチェック
-      if (!demoUser.email.endsWith('@studio-spoon.co.jp')) {
-        alert('Studio Spoon のメールアドレスでログインしてください。');
-        return;
-      }
-
-      // ログイン成功
-      setUser(demoUser);
-      setIsAuthenticated(true);
-      setSelectedMembers([`${demoUser.name} (${demoUser.email})`]);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-    } catch (error) {
-      console.error('ログインエラー:', error);
-      alert('ログインに失敗しました。もう一度お試しください。');
-    } finally {
-      setIsLoading(false);
-    }
+  // Google OAuth ログイン
+  const handleGoogleLogin = () => {
+    signIn('google');
   };
 
   // ログアウト
   const handleLogout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
     setSelectedMembers([]);
     setAvailableSlots([]);
-    localStorage.removeItem('user');
-    // 実際の実装では：
-    // gapi.auth2.getAuthInstance().signOut();
+    signOut();
   };
 
   // サンプルチームメンバー（実際の実装では Google Directory API から取得）
@@ -186,12 +128,56 @@ const Scheduler = () => {
     );
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (selectedMembers.length === 0) {
       alert('参加者を選択してください。');
       return;
     }
-    setAvailableSlots(sampleAvailableSlots);
+
+    try {
+      // 検索期間の計算
+      const timeMin = new Date();
+      const timeMax = new Date();
+      
+      if (selectedPeriod === '直近1週間') {
+        timeMax.setDate(timeMax.getDate() + 7);
+      } else if (selectedPeriod === '直近2週間') {
+        timeMax.setDate(timeMax.getDate() + 14);
+      } else {
+        timeMax.setDate(timeMax.getDate() + 30); // デフォルト
+      }
+
+      // 参加者のメールアドレスを抽出
+      const emails = selectedMembers.map(member => {
+        const match = member.match(/\(([^)]+)\)/);
+        return match ? match[1] : '';
+      }).filter(email => email);
+
+      // Calendar APIを呼び出し
+      const response = await fetch(`/api/calendar?timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&emails=${emails.join(',')}`);
+      
+      if (!response.ok) {
+        throw new Error('カレンダー情報の取得に失敗しました');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // APIレスポンスを既存の形式に変換
+        const formattedSlots = data.data.freeSlots.map((daySlot: { date: string; slots: Array<{ time: string }> }) => ({
+          date: daySlot.date,
+          times: daySlot.slots.map((slot: { time: string }) => slot.time),
+        }));
+        
+        setAvailableSlots(formattedSlots);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error('検索エラー:', error);
+      alert('カレンダー情報の取得に失敗しました。サンプルデータを表示します。');
+      setAvailableSlots(sampleAvailableSlots);
+    }
   };
 
   const generateTextOutput = () => {
@@ -408,16 +394,16 @@ const Scheduler = () => {
                 {/* ユーザー情報 */}
                 <div className='flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-700'>
                   <img
-                    src={user?.picture}
-                    alt={user?.name}
+                    src={session?.user?.image || 'https://via.placeholder.com/32x32/4F46E5/FFFFFF?text=U'}
+                    alt={session?.user?.name || 'User'}
                     className='w-8 h-8 rounded-full'
                   />
                   <div className='hidden sm:block'>
                     <p className='text-sm font-medium text-gray-900 dark:text-white'>
-                      {user?.name}
+                      {session?.user?.name}
                     </p>
                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                      {user?.email}
+                      {session?.user?.email}
                     </p>
                   </div>
                 </div>
@@ -488,15 +474,15 @@ const Scheduler = () => {
                       <input
                         type='checkbox'
                         checked={selectedMembers.includes(
-                          `${user?.name} (${user?.email})`
+                          `${session?.user?.name} (${session?.user?.email})`
                         )}
                         onChange={() =>
-                          handleMemberToggle(`${user?.name} (${user?.email})`)
+                          handleMemberToggle(`${session?.user?.name} (${session?.user?.email})`)
                         }
                         className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
                       />
                       <span className='text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors font-medium'>
-                        {user?.name} (あなた)
+                        {session?.user?.name} (あなた)
                       </span>
                     </label>
 

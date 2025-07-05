@@ -1,8 +1,7 @@
-import NextAuth from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import type { AuthOptions } from "next-auth"
 
-const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,7 +14,7 @@ const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }: { user: any }) {
       // Studio Spoonドメイン制限
       if (user.email && !user.email.endsWith("@studio-spoon.co.jp")) {
         console.log(`Login rejected for email: ${user.email}`)
@@ -23,7 +22,7 @@ const authOptions: AuthOptions = {
       }
       return true
     },
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user }: { token: any; account: any; user: any }) {
       // 初回ログイン時にaccess_tokenを保存
       if (account) {
         token.accessToken = account.access_token
@@ -39,7 +38,7 @@ const authOptions: AuthOptions = {
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       // セッションにaccess_tokenとユーザー情報を含める
       session.accessToken = token.accessToken as string
       session.user = token.user
