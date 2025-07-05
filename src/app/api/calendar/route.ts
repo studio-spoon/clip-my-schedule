@@ -1,11 +1,12 @@
 import { getServerSession } from "next-auth/next"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
+import { authOptions } from "@/lib/auth"
 
 export async function GET(request: NextRequest) {
   try {
     // セッション確認
-    const session = await getServerSession() as any
+    const session = await getServerSession(authOptions) as any
     
     if (!session || !session.accessToken) {
       return NextResponse.json(

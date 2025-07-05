@@ -35,13 +35,73 @@ const Scheduler = () => {
   const [customDuration, setCustomDuration] = useState('75');
   const [theme, setTheme] = useState('system');
   const [isDark, setIsDark] = useState(false);
+  
+  // メンバー関連の状態
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    email: string;
+    name: string;
+    displayName: string;
+    calendarId: string;
+    accessRole: string;
+  }>>([]);
+  const [isMembersLoading, setIsMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState<string | null>(null);
 
-  // セッション初期化
+  // セッション初期化とメンバー取得
   useEffect(() => {
     if (session?.user) {
       setSelectedMembers([`${session.user.name} (${session.user.email})`]);
+      fetchTeamMembers();
     }
   }, [session]);
+
+  // チームメンバーを取得する関数
+  const fetchTeamMembers = async () => {
+    setIsMembersLoading(true);
+    setMembersError(null);
+    
+    try {
+      const response = await fetch('/api/members');
+      
+      if (!response.ok) {
+        throw new Error('メンバー情報の取得に失敗しました');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setTeamMembers(data.data.members);
+        
+        // 自分を最初に選択状態にする
+        const currentUser = data.data.members.find((member: any) => 
+          member.email === session?.user?.email
+        );
+        if (currentUser) {
+          setSelectedMembers([currentUser.displayName]);
+        }
+      } else {
+        throw new Error(data.error || 'メンバー情報の取得に失敗しました');
+      }
+    } catch (error) {
+      console.error('Members fetch error:', error);
+      setMembersError(error instanceof Error ? error.message : '不明なエラー');
+      
+      // フォールバック: サンプルデータを使用
+      const fallbackMembers = [
+        {
+          email: session?.user?.email || 'user@example.com',
+          name: session?.user?.name || 'あなた',
+          displayName: `${session?.user?.name || 'あなた'} (${session?.user?.email || 'user@example.com'})`,
+          calendarId: session?.user?.email || 'user@example.com',
+          accessRole: 'owner'
+        }
+      ];
+      setTeamMembers(fallbackMembers);
+      setSelectedMembers([fallbackMembers[0].displayName]);
+    } finally {
+      setIsMembersLoading(false);
+    }
+  };
 
   // テーマ設定の初期化とシステム設定の監視
   useEffect(() => {
@@ -93,14 +153,7 @@ const Scheduler = () => {
     signOut();
   };
 
-  // サンプルチームメンバー（実際の実装では Google Directory API から取得）
-  const teamMembers = [
-    '田中太郎 (taro@example.com)',
-    '佐藤花子 (hanako@gmail.com)',
-    '山田次郎 (jiro@company.co.jp)',
-    '鈴木美咲 (misaki@outlook.com)',
-    '高橋健一 (kenichi@example.org)',
-  ];
+  // 削除: サンプルデータは上記のuseStateで管理
 
   // サンプル空き時間データ
   const sampleAvailableSlots = [
@@ -147,10 +200,10 @@ const Scheduler = () => {
         timeMax.setDate(timeMax.getDate() + 30); // デフォルト
       }
 
-      // 参加者のメールアドレスを抽出
-      const emails = selectedMembers.map(member => {
-        const match = member.match(/\(([^)]+)\)/);
-        return match ? match[1] : '';
+      // 参加者のカレンダーIDを抽出
+      const emails = selectedMembers.map(memberDisplayName => {
+        const member = teamMembers.find(m => m.displayName === memberDisplayName);
+        return member ? member.calendarId : '';
       }).filter(email => email);
 
       // Calendar APIを呼び出し
@@ -475,45 +528,59 @@ const Scheduler = () => {
                     参加者を選択
                   </h2>
                   <span className='text-sm text-gray-500 dark:text-gray-400'>
-                    共有済みカレンダーから
+                    {isMembersLoading ? '読み込み中...' : '共有済みカレンダーから'}
                   </span>
                 </div>
                 <div className='bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600'>
-                  <div className='space-y-3'>
-                    {/* 自分（常に選択済み） */}
-                    <label className='flex items-center gap-3 cursor-pointer group'>
-                      <input
-                        type='checkbox'
-                        checked={selectedMembers.includes(
-                          `${session?.user?.name} (${session?.user?.email})`
-                        )}
-                        onChange={() =>
-                          handleMemberToggle(`${session?.user?.name} (${session?.user?.email})`)
-                        }
-                        className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
-                      />
-                      <span className='text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors font-medium'>
-                        {session?.user?.name} (あなた)
-                      </span>
-                    </label>
-
-                    {/* チームメンバー */}
-                    {teamMembers.map((member) => (
-                      <label
-                        key={member}
-                        className='flex items-center gap-3 cursor-pointer group'
+                  {membersError && (
+                    <div className='mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
+                      <p className='text-sm text-yellow-800 dark:text-yellow-200'>
+                        ⚠️ {membersError}
+                      </p>
+                      <button 
+                        onClick={fetchTeamMembers}
+                        className='mt-2 text-sm text-yellow-600 dark:text-yellow-400 hover:underline'
                       >
-                        <input
-                          type='checkbox'
-                          checked={selectedMembers.includes(member)}
-                          onChange={() => handleMemberToggle(member)}
-                          className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
-                        />
-                        <span className='text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors'>
-                          {member}
-                        </span>
-                      </label>
-                    ))}
+                        再試行
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className='space-y-3'>
+                    {isMembersLoading ? (
+                      <div className='flex items-center gap-3 py-2'>
+                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600'></div>
+                        <span className='text-gray-600 dark:text-gray-400'>メンバーを読み込み中...</span>
+                      </div>
+                    ) : (
+                      teamMembers.map((member) => (
+                        <label
+                          key={member.email}
+                          className='flex items-center gap-3 cursor-pointer group'
+                        >
+                          <input
+                            type='checkbox'
+                            checked={selectedMembers.includes(member.displayName)}
+                            onChange={() => handleMemberToggle(member.displayName)}
+                            className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+                          />
+                          <span className='text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors'>
+                            {member.displayName}
+                            {member.accessRole === 'owner' && (
+                              <span className='ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-1 rounded'>
+                                あなた
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      ))
+                    )}
+                    
+                    {!isMembersLoading && teamMembers.length === 0 && !membersError && (
+                      <p className='text-gray-500 dark:text-gray-400 text-sm py-2'>
+                        共有されているカレンダーが見つかりません
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
