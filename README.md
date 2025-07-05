@@ -1,13 +1,13 @@
-# Studio Spoon スケジュール調整アプリ
+# Clip My Schedule
 
 ## 概要
 
-Studio Spoon社内のスケジュール調整を効率化するWebアプリケーションです。  
-Google OAuth認証とGoogle Calendar連携により、チームメンバーの空き時間を簡単に検索・共有できます。
+Googleカレンダー連携による簡単スケジュール調整アプリです。  
+チームメンバーの空き時間を素早く検索・共有し、効率的な会議設定をサポートします。
 
 ## 主な機能
 
-- 🔐 **Google OAuth認証** - Studio Spoonドメイン限定ログイン
+- 🔐 **Google OAuth認証** - 誰でも利用可能なGoogleアカウントログイン
 - 📅 **スケジュール検索** - 複数メンバーの空き時間を一括検索
 - 🎨 **テーマ切り替え** - ライト/ダーク/システム連動
 - 📱 **レスポンシブデザイン** - PC・スマホ対応
@@ -68,7 +68,7 @@ npm run lint
 
 ## 使用方法
 
-1. **ログイン**: Studio Spoonのメールアドレスでログイン
+1. **ログイン**: Googleアカウントでログイン
 2. **参加者選択**: 空き時間を確認したいメンバーを選択
 3. **条件設定**: 開催時期・時間帯・所要時間を設定
 4. **検索実行**: 空き時間を検索ボタンをクリック
@@ -107,4 +107,4 @@ src/
 
 ---
 
-© 2025 Studio Spoon. All rights reserved.
+© 2025 [STUDIO SPOON](https://studio-spoon.co.jp/). All rights reserved.

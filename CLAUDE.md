@@ -1,8 +1,8 @@
-# Studio Spoon Schedule Coordination App
+# Clip My Schedule
 
 ## Project Overview
 
-This is a Next.js application for schedule coordination within Studio Spoon, featuring Google OAuth authentication and Google Calendar integration.
+This is a Next.js application for easy schedule coordination, featuring Google OAuth authentication and Google Calendar integration for anyone with a Google account.
 
 ## Tech Stack
 
@@ -42,7 +42,7 @@ src/
 
 ## Key Features
 
-- Google OAuth authentication with Studio Spoon domain restriction
+- Google OAuth authentication (open to all Google accounts)
 - Theme switching (light/dark/system)
 - Schedule search with customizable parameters
 - Export functionality for schedule results
@@ -68,10 +68,10 @@ NEXTAUTH_SECRET=your_nextauth_secret
 
 ## TODO
 
-- [ ] Complete Google OAuth setup
-- [ ] Implement real Google Calendar API integration
+- [x] Complete Google OAuth setup (open to all Google accounts)
+- [x] Implement real Google Calendar API integration
 - [ ] Add proper TypeScript interfaces
-- [ ] Set up domain restriction for Studio Spoon emails
+- [ ] Add team member invitation feature
 - [ ] Add error handling and loading states
 
 ## 【MUST GLOBAL】Gemini・o3 活用（プロジェクトの CLAUDE.md より優先）

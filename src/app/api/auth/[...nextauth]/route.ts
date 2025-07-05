@@ -15,11 +15,7 @@ const authOptions = {
   ],
   callbacks: {
     async signIn({ user }: { user: any }) {
-      // Studio Spoonドメイン制限
-      if (user.email && !user.email.endsWith("@studio-spoon.co.jp")) {
-        console.log(`Login rejected for email: ${user.email}`)
-        return false
-      }
+      // 全てのGoogleアカウントでログイン可能
       return true
     },
     async jwt({ token, account, user }: { token: any; account: any; user: any }) {

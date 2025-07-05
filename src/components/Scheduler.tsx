@@ -95,11 +95,11 @@ const Scheduler = () => {
 
   // サンプルチームメンバー（実際の実装では Google Directory API から取得）
   const teamMembers = [
-    '田中太郎 (taro@studio-spoon.co.jp)',
-    '佐藤花子 (hanako@studio-spoon.co.jp)',
-    '山田次郎 (jiro@studio-spoon.co.jp)',
-    '鈴木美咲 (misaki@studio-spoon.co.jp)',
-    '高橋健一 (kenichi@studio-spoon.co.jp)',
+    '田中太郎 (taro@example.com)',
+    '佐藤花子 (hanako@gmail.com)',
+    '山田次郎 (jiro@company.co.jp)',
+    '鈴木美咲 (misaki@outlook.com)',
+    '高橋健一 (kenichi@example.org)',
   ];
 
   // サンプル空き時間データ
@@ -284,10 +284,10 @@ const Scheduler = () => {
                   <Calendar className='w-12 h-12 text-white' />
                 </div>
                 <h1 className='text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2'>
-                  Studio Spoon
+                  Clip My Schedule
                 </h1>
                 <p className='text-gray-600 dark:text-gray-400'>
-                  スケジュール調整アプリ
+                  簡単スケジュール調整
                 </p>
               </div>
 
@@ -296,13 +296,12 @@ const Scheduler = () => {
                 <div className='flex items-center gap-3 mb-2'>
                   <Shield className='w-5 h-5 text-blue-600 dark:text-blue-400' />
                   <span className='font-semibold text-blue-900 dark:text-blue-100'>
-                    セキュリティについて
+                    プライバシーについて
                   </span>
                 </div>
                 <p className='text-sm text-blue-800 dark:text-blue-200'>
-                  Studio Spoon
-                  のメールアドレス（@studio-spoon.co.jp）でのログインが必要です。
                   お客様のカレンダー情報は暗号化され、安全に処理されます。
+                  データは一時的に処理されるのみで、永続的な保存は行いません。
                 </p>
               </div>
 
@@ -340,23 +339,35 @@ const Scheduler = () => {
               </button>
 
               {/* フッター */}
-              <div className='mt-6 text-center'>
+              <div className='mt-6 text-center space-y-2'>
                 <p className='text-xs text-gray-500 dark:text-gray-400'>
                   ログインすることで、
                   <a
-                    href='#'
+                    href='/terms'
                     className='text-blue-600 dark:text-blue-400 hover:underline'
                   >
                     利用規約
                   </a>
                   および
                   <a
-                    href='#'
+                    href='/privacy'
                     className='text-blue-600 dark:text-blue-400 hover:underline'
                   >
                     プライバシーポリシー
                   </a>
                   に同意したことになります。
+                </p>
+                <p className='text-xs text-gray-500 dark:text-gray-400'>
+                  © 2025{' '}
+                  <a
+                    href='https://studio-spoon.co.jp/'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-blue-600 dark:text-blue-400 hover:underline'
+                  >
+                    STUDIO SPOON
+                  </a>
+                  . All rights reserved.
                 </p>
               </div>
             </div>
@@ -382,10 +393,10 @@ const Scheduler = () => {
                 </div>
                 <div>
                   <h1 className='text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent'>
-                    Studio Spoon
+                    Clip My Schedule
                   </h1>
                   <p className='text-gray-600 dark:text-gray-400 text-sm'>
-                    スケジュール調整アプリ
+                    簡単スケジュール調整
                   </p>
                 </div>
               </div>

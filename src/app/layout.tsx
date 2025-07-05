@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Studio Spoon スケジュール調整",
-  description: "Studio Spoonのスケジュール調整アプリ",
+  title: "Clip My Schedule",
+  description: "簡単スケジュール調整アプリ - Googleカレンダー連携でチームの空き時間を素早く検索",
 };
 
 export default function RootLayout({
