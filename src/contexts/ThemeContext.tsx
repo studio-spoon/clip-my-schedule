@@ -16,38 +16,46 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('system')
   const [isDark, setIsDark] = useState(false)
 
-  // テーマ設定の初期化とシステム設定の監視
+  // テーマ設定の初期化
   useEffect(() => {
     const savedTheme = (localStorage.getItem('theme') as Theme) || 'system'
     setTheme(savedTheme)
+  }, [])
 
+  // テーマに基づいてisDarkを更新
+  useEffect(() => {
     const updateTheme = () => {
-      if (savedTheme === 'system') {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        setIsDark(systemDark)
+      let darkMode = false
+      
+      if (theme === 'system') {
+        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
       } else {
-        setIsDark(savedTheme === 'dark')
+        darkMode = theme === 'dark'
+      }
+      
+      setIsDark(darkMode)
+      
+      // HTMLのdarkクラスを更新
+      if (darkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
       }
     }
 
     updateTheme()
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', updateTheme)
-
-    return () => mediaQuery.removeEventListener('change', updateTheme)
+    // システムテーマの場合のみ、システム設定の変更を監視
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      mediaQuery.addEventListener('change', updateTheme)
+      return () => mediaQuery.removeEventListener('change', updateTheme)
+    }
   }, [theme])
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
     localStorage.setItem('theme', newTheme)
-
-    if (newTheme === 'system') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      setIsDark(systemDark)
-    } else {
-      setIsDark(newTheme === 'dark')
-    }
   }
 
   return (

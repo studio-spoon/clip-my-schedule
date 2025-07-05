@@ -2,15 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-
-export interface Member {
-  email: string
-  name: string
-  displayName: string
-  calendarId: string
-  accessRole: string
-  source: 'self' | 'shared' | 'organization'
-}
+import { api } from '@/services/api'
+import type { Member } from '@/types/api'
 
 export function useMembers() {
   const { data: session } = useSession()
@@ -25,18 +18,12 @@ export function useMembers() {
     setError(null)
     
     try {
-      const response = await fetch('/api/members')
+      const result = await api.members.getMembers()
       
-      if (!response.ok) {
-        throw new Error('メンバー情報の取得に失敗しました')
-      }
-
-      const data = await response.json()
-      
-      if (data.success) {
-        setTeamMembers(data.data.members)
+      if (result.success && result.data) {
+        setTeamMembers(result.data.members)
       } else {
-        throw new Error(data.error || 'メンバー情報の取得に失敗しました')
+        throw new Error(result.error || 'メンバー情報の取得に失敗しました')
       }
     } catch (error) {
       console.error('Members fetch error:', error)

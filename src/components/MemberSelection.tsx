@@ -1,7 +1,7 @@
 'use client'
 
 import { Users } from 'lucide-react'
-import { Member } from '@/hooks/useMembers'
+import type { Member } from '@/types/api'
 
 interface MemberSelectionProps {
   teamMembers: Member[]

@@ -1,61 +1,21 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { Calendar, Shield, Sun, Moon, Monitor } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
+import { Calendar, Shield } from 'lucide-react'
 
 interface LoginFormProps {
   isLoading: boolean
 }
 
 export default function LoginForm({ isLoading }: LoginFormProps) {
-  const { theme, isDark, setTheme } = useTheme()
-
   const handleGoogleLogin = () => {
     signIn('google')
   }
 
-  const themeClass = isDark ? 'dark' : ''
-
   return (
-    <div className={`${themeClass} min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200`}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
       <div className='min-h-screen flex items-center justify-center p-4'>
         <div className='max-w-md w-full'>
-          {/* テーマ切り替え */}
-          <div className='flex justify-end mb-8'>
-            <div className='flex items-center gap-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg border border-gray-200 dark:border-gray-700'>
-              <button
-                onClick={() => setTheme('light')}
-                className={`p-2 rounded-full transition-all duration-200 ${
-                  theme === 'light'
-                    ? 'bg-yellow-500 text-white shadow-md'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                }`}
-              >
-                <Sun className='w-4 h-4' />
-              </button>
-              <button
-                onClick={() => setTheme('system')}
-                className={`p-2 rounded-full transition-all duration-200 ${
-                  theme === 'system'
-                    ? 'bg-gray-500 text-white shadow-md'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                }`}
-              >
-                <Monitor className='w-4 h-4' />
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={`p-2 rounded-full transition-all duration-200 ${
-                  theme === 'dark'
-                    ? 'bg-purple-500 text-white shadow-md'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                }`}
-              >
-                <Moon className='w-4 h-4' />
-              </button>
-            </div>
-          </div>
 
           {/* ログインカード */}
           <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 backdrop-blur-sm'>
