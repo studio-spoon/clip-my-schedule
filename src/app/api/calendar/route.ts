@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth/next"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
+import { getCachedCalendarData, setCachedCalendarData, getCacheStats } from "@/lib/calendar-cache"
+import { processScheduleParams, validateScheduleParams, type ScheduleParams, type ProcessedScheduleParams } from "@/lib/schedule-processor"
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,15 +42,59 @@ export async function GET(request: NextRequest) {
 
     // クエリパラメータの取得
     const { searchParams } = new URL(request.url)
-    const timeMin = searchParams.get('timeMin') || new Date().toISOString()
-    const timeMax = searchParams.get('timeMax') || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
     const emails = searchParams.get('emails')?.split(',') || [session.user.email]
+    
+    // スケジュールパラメータの取得
+    const scheduleParams: ScheduleParams = {
+      selectedPeriod: searchParams.get('selectedPeriod') || '直近1週間',
+      selectedTimeSlot: searchParams.get('selectedTimeSlot') || 'デフォルト',
+      customTimeStart: searchParams.get('customTimeStart') || '',
+      customTimeEnd: searchParams.get('customTimeEnd') || '',
+      meetingDuration: searchParams.get('meetingDuration') || '60分',
+      bufferTimeBefore: searchParams.get('bufferTimeBefore') || '0分',
+      bufferTimeAfter: searchParams.get('bufferTimeAfter') || '0分',
+      customDuration: searchParams.get('customDuration') || '',
+      customPeriodStart: searchParams.get('customPeriodStart') || undefined,
+      customPeriodEnd: searchParams.get('customPeriodEnd') || undefined,
+    }
+    
+    // パラメータ検証
+    const validation = validateScheduleParams(scheduleParams)
+    if (!validation.isValid) {
+      return NextResponse.json({
+        success: false,
+        error: `パラメータエラー: ${validation.errors.join(', ')}`,
+        warnings: validation.warnings
+      }, { status: 400 })
+    }
+    
+    // パラメータ処理
+    const processedParams = processScheduleParams(scheduleParams)
+    const timeMin = processedParams.timeRange.start.toISOString()
+    const timeMax = processedParams.timeRange.end.toISOString()
+
+    // ログ出力: リクエスト情報
+    console.log(`🔍 Calendar API Request:`)
+    console.log(`   Time range: ${timeMin} to ${timeMax}`)
+    console.log(`   Emails: ${emails.join(', ')}`)
+    console.log(`   Cache stats:`, getCacheStats())
 
     // 複数のカレンダーから空き時間を取得
     const busyTimesPromises = emails.map(async (email) => {
       try {
-        console.log(`Fetching calendar data for ${email}...`)
-        console.log(`Time range: ${timeMin} to ${timeMax}`)
+        // キャッシュをチェック
+        const cachedData = getCachedCalendarData(email, timeMin, timeMax)
+        if (cachedData) {
+          console.log(`🎯 Using cached data for ${email}`)
+          return {
+            email,
+            busy: cachedData.busyPeriods,
+            source: 'cache',
+            cachedAt: new Date(cachedData.cachedAt).toISOString()
+          }
+        }
+
+        console.log(`📡 Fetching fresh calendar data for ${email}...`)
         
         const response = await calendar.freebusy.query({
           requestBody: {
@@ -62,22 +108,26 @@ export async function GET(request: NextRequest) {
         const calendarErrors = response.data.calendars?.[email]?.errors || []
         
         if (calendarErrors.length > 0) {
-          console.warn(`Calendar errors for ${email}:`, calendarErrors)
+          console.warn(`⚠️ Calendar errors for ${email}:`, calendarErrors)
         }
-        
-        console.log(`Raw busy periods for ${email}:`, JSON.stringify(busyPeriods, null, 2))
         
         const processedBusy = busyPeriods.map((period: any) => ({
           start: period.start || '',
           end: period.end || ''
         })).filter((period: any) => period.start && period.end)
         
-        console.log(`Processed busy periods for ${email}:`, JSON.stringify(processedBusy, null, 2))
+        // キャッシュに保存
+        setCachedCalendarData(email, timeMin, timeMax, processedBusy)
+        
+        console.log(`✅ Fetched ${processedBusy.length} busy periods for ${email}`)
+        if (processedBusy.length > 0) {
+          console.log(`📅 Busy periods:`, processedBusy.map(p => `${p.start} - ${p.end}`))}
         
         return {
           email,
           busy: processedBusy,
           errors: calendarErrors,
+          source: 'api'
         }
       } catch (error: any) {
         console.error(`Error fetching calendar for ${email}:`, error)
@@ -104,8 +154,18 @@ export async function GET(request: NextRequest) {
     const busyTimes = await Promise.all(busyTimesPromises)
     console.log('All busy times collected:', JSON.stringify(busyTimes, null, 2))
 
-    // 空き時間の計算
-    const freeSlots = calculateFreeSlots(busyTimes, timeMin, timeMax)
+    // エラーチェック
+    const firstError = busyTimes.find(bt => bt.error)
+    if (firstError) {
+      return NextResponse.json({
+        success: false,
+        error: `カレンダー「${firstError.email}」の取得に失敗しました: ${firstError.error}`,
+        errorDetails: busyTimes.filter(bt => bt.error)
+      }, { status: 502 }) // Bad Gateway
+    }
+
+    // 空き時間の計算（処理されたパラメータを使用）
+    const freeSlots = calculateFreeSlots(busyTimes, processedParams)
     console.log('Calculated free slots:', JSON.stringify(freeSlots, null, 2))
 
     return NextResponse.json({
@@ -130,38 +190,44 @@ export async function GET(request: NextRequest) {
 // 空き時間計算関数
 function calculateFreeSlots(
   busyTimes: Array<{ email: string; busy: Array<{ start: string; end: string }> }>,
-  timeMin: string,
-  timeMax: string
+  params: ProcessedScheduleParams
 ) {
   const slots = []
-  const start = new Date(timeMin)
-  const end = new Date(timeMax)
+  const start = params.timeRange.start
+  const end = params.timeRange.end
+  const workingHours = params.workingHours
+  const meetingDuration = params.meetingDuration
+  const bufferTimeBefore = params.bufferTimeBefore
+  const bufferTimeAfter = params.bufferTimeAfter
   
-  // 営業時間設定 (10:00-17:00) - 日本時間基準
-  const workingHours = { start: 10, end: 17 }
-  
-  console.log(`Calculating free slots from ${start.toISOString()} to ${end.toISOString()}`)
+  console.log(`📊 Calculating free slots with parameters:`)
+  console.log(`   Time range: ${start.toISOString()} to ${end.toISOString()}`)
+  console.log(`   Working hours: ${workingHours.start}:00-${workingHours.end}:00`)
+  console.log(`   Meeting duration: ${meetingDuration} minutes`)
+  console.log(`   Buffer time before: ${bufferTimeBefore} minutes`)
+  console.log(`   Buffer time after: ${bufferTimeAfter} minutes`)
   
   for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
     // 土日をスキップ
     if (date.getDay() === 0 || date.getDay() === 6) {
-      console.log(`Skipping weekend: ${date.toDateString()}`)
+      console.log(`⏭️ Skipping weekend: ${date.toDateString()}`)
       continue
     }
     
-    console.log(`\nProcessing date: ${date.toDateString()}`)
+    console.log(`\n📅 Processing date: ${date.toDateString()}`)
     const daySlots = []
     
-    // 1時間ごとのスロットをチェック
-    for (let hour = workingHours.start; hour < workingHours.end; hour++) {
-      // 日本時間でスロット時間を設定 (UTC+9を考慮)
+    const slotIncrement = 15; // 15分単位でチェック
+    const totalSlotMinutes = params.totalSlotDuration;
+    
+    // 指定された時間範囲内でスロットをチェック
+    for (let minute = workingHours.start * 60; minute <= workingHours.end * 60 - totalSlotMinutes; minute += slotIncrement) {
       const slotStart = new Date(date)
-      slotStart.setUTCHours(hour - 9, 0, 0, 0) // 日本時間をUTCに変換
+      slotStart.setHours(0, minute, 0, 0)
       
-      const slotEnd = new Date(date)
-      slotEnd.setUTCHours(hour - 9 + 1, 0, 0, 0)
+      const slotEnd = new Date(slotStart.getTime() + totalSlotMinutes * 60 * 1000)
       
-      console.log(`  Checking slot ${hour}:00-${hour+1}:00 JST (${slotStart.toISOString()} - ${slotEnd.toISOString()} UTC)`)
+      console.log(`  🕐 Checking slot ${slotStart.toLocaleTimeString()}-${slotEnd.toLocaleTimeString()}`)
       
       // 全員が空いているかチェック
       let isSlotFree = true
@@ -172,16 +238,8 @@ function calculateFreeSlots(
           const busyStartTime = new Date(busyStart)
           const busyEndTime = new Date(busyEnd)
           
-          // より厳密な重複チェック
           const hasConflict = (
-            // ケース1: スロットが忙しい時間内で開始
-            (slotStart >= busyStartTime && slotStart < busyEndTime) ||
-            // ケース2: スロットが忙しい時間内で終了
-            (slotEnd > busyStartTime && slotEnd <= busyEndTime) ||
-            // ケース3: スロットが忙しい時間を完全に包含
-            (slotStart < busyStartTime && slotEnd > busyEndTime) ||
-            // ケース4: 忙しい時間がスロットを完全に包含
-            (busyStartTime <= slotStart && busyEndTime >= slotEnd)
+            (slotStart < busyEndTime && slotEnd > busyStartTime)
           )
           
           if (hasConflict) {
@@ -189,22 +247,30 @@ function calculateFreeSlots(
             conflictDetails.push({
               email,
               busyPeriod: `${busyStartTime.toISOString()} - ${busyEndTime.toISOString()}`,
-              reason: 'Time conflict detected'
+              slotPeriod: `${slotStart.toISOString()} - ${slotEnd.toISOString()}`,
+              reason: 'Time conflict'
             })
-            console.log(`    ❌ CONFLICT with ${email}: ${busyStart} - ${busyEnd}`)
+            console.log(`    ❌ CONFLICT with ${email}: busy ${busyStart} - ${busyEnd}`)
           }
         }
       }
       
       if (isSlotFree) {
-        console.log(`    ✅ FREE slot`)
+        const meetingStart = new Date(slotStart.getTime() + bufferTimeBefore * 60 * 1000);
+        const meetingEnd = new Date(meetingStart.getTime() + meetingDuration * 60 * 1000);
+
+        console.log(`    ✅ FREE slot (${meetingDuration}min meeting + ${bufferTimeBefore}min before + ${bufferTimeAfter}min after)`)
+        
         daySlots.push({
-          start: slotStart.toISOString(),
-          end: slotEnd.toISOString(),
-          time: `${hour.toString().padStart(2, '0')}:00-${(hour + 1).toString().padStart(2, '0')}:00`,
+          start: meetingStart.toISOString(),
+          end: meetingEnd.toISOString(),
+          time: `${meetingStart.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${meetingEnd.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`,
+          duration: meetingDuration,
+          bufferBefore: bufferTimeBefore,
+          bufferAfter: bufferTimeAfter
         })
       } else {
-        console.log(`    ❌ BUSY slot - conflicts:`, conflictDetails)
+        console.log(`    ❌ BUSY slot - conflicts:`, conflictDetails.length)
       }
     }
     
@@ -216,17 +282,23 @@ function calculateFreeSlots(
         weekday: 'short',
       })
       
-      console.log(`  📅 Adding ${daySlots.length} free slots for ${dateStr}`)
+      console.log(`  📋 Adding ${daySlots.length} free slots for ${dateStr}`)
       
       slots.push({
         date: dateStr,
         times: daySlots.map(slot => slot.time),
+        metadata: {
+          workingHours: `${workingHours.start}:00-${workingHours.end}:00`,
+          meetingDuration: `${meetingDuration}分`,
+          bufferTimeBefore: `${bufferTimeBefore}分`,
+          bufferTimeAfter: `${bufferTimeAfter}分`
+        }
       })
     } else {
-      console.log(`  📅 No free slots found for this date`)
+      console.log(`  📋 No free slots found for this date`)
     }
   }
   
-  console.log(`\nFinal result: ${slots.length} days with free slots`)
+  console.log(`\n🎯 Final result: ${slots.length} days with free slots`)
   return slots
 }

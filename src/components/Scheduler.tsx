@@ -23,7 +23,7 @@ function SchedulerContent() {
   const scheduleState = useScheduleState();
   const { availableSlots, isSearching, hasSearched, searchSchedule } = useScheduleSearch();
 
-  // セッション初期化
+  // セッ���ョン初期化
   useEffect(() => {
     if (session?.user && teamMembers.length > 0 && scheduleState.selectedMembers.length === 0) {
       // 自分を最初に選択状態にする
@@ -44,9 +44,23 @@ function SchedulerContent() {
   };
 
   const handleSearch = () => {
+    // 🔍 Scheduler component - パラメータをログ出力して確認
+    console.log('🎯 Scheduler.handleSearch called with state:')
+    console.log('   selectedMembers:', scheduleState.selectedMembers)
+    console.log('   selectedPeriod:', scheduleState.selectedPeriod)
+    console.log('   selectedTimeSlot:', scheduleState.selectedTimeSlot)
+    console.log('   customTimeStart:', scheduleState.customTimeStart)
+    console.log('   customTimeEnd:', scheduleState.customTimeEnd)
+    console.log('   meetingDuration:', scheduleState.meetingDuration)
+    console.log('   bufferTimeBefore:', scheduleState.bufferTimeBefore)
+    console.log('   bufferTimeAfter:', scheduleState.bufferTimeAfter)
+    console.log('   customDuration:', scheduleState.customDuration)
+    console.log('   customPeriodStart:', scheduleState.customPeriodStart)
+    console.log('   customPeriodEnd:', scheduleState.customPeriodEnd)
+    console.log('   teamMembers count:', teamMembers.length)
+
     searchSchedule({
-      selectedMembers: scheduleState.selectedMembers,
-      selectedPeriod: scheduleState.selectedPeriod,
+      ...scheduleState.scheduleState,
       teamMembers
     });
   };
@@ -67,8 +81,11 @@ function SchedulerContent() {
     scheduleState.customTimeStart,
     scheduleState.customTimeEnd,
     scheduleState.meetingDuration,
-    scheduleState.bufferTime,
+    scheduleState.bufferTimeBefore,
+    scheduleState.bufferTimeAfter,
     scheduleState.customDuration,
+    scheduleState.customPeriodStart,
+    scheduleState.customPeriodEnd,
     hasSearched
   ]);
 
@@ -128,8 +145,11 @@ function SchedulerContent() {
                 customTimeStart={scheduleState.customTimeStart}
                 customTimeEnd={scheduleState.customTimeEnd}
                 meetingDuration={scheduleState.meetingDuration}
-                bufferTime={scheduleState.bufferTime}
+                bufferTimeBefore={scheduleState.bufferTimeBefore}
+                bufferTimeAfter={scheduleState.bufferTimeAfter}
                 customDuration={scheduleState.customDuration}
+                customPeriodStart={scheduleState.customPeriodStart}
+                customPeriodEnd={scheduleState.customPeriodEnd}
                 isSearching={isSearching}
                 hasSearched={hasSearched}
                 onPeriodChange={scheduleState.setSelectedPeriod}
@@ -137,8 +157,11 @@ function SchedulerContent() {
                 onCustomTimeStartChange={scheduleState.setCustomTimeStart}
                 onCustomTimeEndChange={scheduleState.setCustomTimeEnd}
                 onMeetingDurationChange={scheduleState.setMeetingDuration}
-                onBufferTimeChange={scheduleState.setBufferTime}
+                onBufferTimeBeforeChange={scheduleState.setBufferTimeBefore}
+                onBufferTimeAfterChange={scheduleState.setBufferTimeAfter}
                 onCustomDurationChange={scheduleState.setCustomDuration}
+                onCustomPeriodStartChange={scheduleState.setCustomPeriodStart}
+                onCustomPeriodEndChange={scheduleState.setCustomPeriodEnd}
                 onSearch={handleSearch}
               />
               
@@ -150,7 +173,8 @@ function SchedulerContent() {
                 customTimeStart={scheduleState.customTimeStart}
                 customTimeEnd={scheduleState.customTimeEnd}
                 meetingDuration={scheduleState.meetingDuration}
-                bufferTime={scheduleState.bufferTime}
+                bufferTimeAfter={scheduleState.bufferTimeAfter}
+                bufferTimeBefore={scheduleState.bufferTimeBefore}
               />
             </div>
           </div>

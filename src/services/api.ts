@@ -25,11 +25,13 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<ApiRes
       ...options,
     })
 
+    const data = await response.json()
+
     if (!response.ok) {
-      throw new ApiError(`HTTP error! status: ${response.status}`, response.status)
+      const errorMessage = data.error || `HTTP error! status: ${response.status}`
+      throw new ApiError(errorMessage, response.status)
     }
 
-    const data = await response.json()
     return data
   } catch (error) {
     console.error('API request failed:', error)
@@ -62,14 +64,39 @@ export const membersApi = {
 }
 
 export const calendarApi = {
-  async searchAvailableSlots(params: CalendarSearchParams): Promise<ApiResponse<ScheduleSearchResult>> {
+  async searchAvailableSlots(
+    params: CalendarSearchParams, 
+    scheduleParams?: {
+      selectedPeriod?: string
+      selectedTimeSlot?: string
+      customTimeStart?: string
+      customTimeEnd?: string
+      meetingDuration?: string
+      bufferTime?: string
+      customDuration?: string
+    }
+  ): Promise<ApiResponse<ScheduleSearchResult>> {
     const searchParams = new URLSearchParams({
       timeMin: params.timeMin,
       timeMax: params.timeMax,
       emails: params.emails.join(',')
     })
     
-    return apiRequest<ScheduleSearchResult>(`/api/calendar?${searchParams}`)
+    // スケジュールパラメータを追加
+    console.log('📤 API Service - Schedule params received:', scheduleParams)
+    if (scheduleParams) {
+      Object.entries(scheduleParams).forEach(([key, value]) => {
+        console.log(`   ${key}: "${value}" (${typeof value})`)
+        if (value) {
+          searchParams.append(key, value)
+        }
+      })
+    }
+    
+    const finalUrl = `/api/calendar?${searchParams}`
+    console.log('📤 API Service - Final URL:', finalUrl)
+    
+    return apiRequest<ScheduleSearchResult>(finalUrl)
   }
 }
 

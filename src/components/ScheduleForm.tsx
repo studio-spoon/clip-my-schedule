@@ -8,8 +8,11 @@ interface ScheduleFormProps {
   customTimeStart: string
   customTimeEnd: string
   meetingDuration: string
-  bufferTime: string
+  bufferTimeBefore: string
+  bufferTimeAfter: string
   customDuration: string
+  customPeriodStart: string
+  customPeriodEnd: string
   isSearching?: boolean
   hasSearched?: boolean
   onPeriodChange: (period: string) => void
@@ -17,8 +20,11 @@ interface ScheduleFormProps {
   onCustomTimeStartChange: (time: string) => void
   onCustomTimeEndChange: (time: string) => void
   onMeetingDurationChange: (duration: string) => void
-  onBufferTimeChange: (buffer: string) => void
+  onBufferTimeBeforeChange: (buffer: string) => void
+  onBufferTimeAfterChange: (buffer: string) => void
   onCustomDurationChange: (duration: string) => void
+  onCustomPeriodStartChange: (date: string) => void
+  onCustomPeriodEndChange: (date: string) => void
   onSearch: () => void
 }
 
@@ -28,8 +34,11 @@ export default function ScheduleForm({
   customTimeStart,
   customTimeEnd,
   meetingDuration,
-  bufferTime,
+  bufferTimeBefore,
+  bufferTimeAfter,
   customDuration,
+  customPeriodStart,
+  customPeriodEnd,
   isSearching = false,
   hasSearched = false,
   onPeriodChange,
@@ -37,8 +46,11 @@ export default function ScheduleForm({
   onCustomTimeStartChange,
   onCustomTimeEndChange,
   onMeetingDurationChange,
-  onBufferTimeChange,
+  onBufferTimeBeforeChange,
+  onBufferTimeAfterChange,
   onCustomDurationChange,
+  onCustomPeriodStartChange,
+  onCustomPeriodEndChange,
   onSearch
 }: ScheduleFormProps) {
   return (
@@ -66,6 +78,40 @@ export default function ScheduleForm({
             </button>
           ))}
         </div>
+        
+        {selectedPeriod === '期間を指定' && (
+          <div className='mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600'>
+            <div className='flex gap-4 items-center'>
+              <div className='flex flex-col'>
+                <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+                  開始日
+                </label>
+                <input
+                  type='date'
+                  value={customPeriodStart}
+                  onChange={(e) => onCustomPeriodStartChange(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className='border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent'
+                />
+              </div>
+              <span className='text-gray-500 dark:text-gray-400 font-medium mt-6'>
+                〜
+              </span>
+              <div className='flex flex-col'>
+                <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+                  終了日
+                </label>
+                <input
+                  type='date'
+                  value={customPeriodEnd}
+                  onChange={(e) => onCustomPeriodEndChange(e.target.value)}
+                  min={customPeriodStart || new Date().toISOString().split('T')[0]}
+                  className='border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent'
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 時間帯 */}
@@ -166,28 +212,55 @@ export default function ScheduleForm({
         </div>
       </div>
 
-      {/* 前後隙間時間 */}
+      {/* 隙間時間 */}
       <div className='mb-8'>
         <div className='flex items-center gap-3 mb-4'>
           <div className='w-3 h-3 bg-gradient-to-r from-red-400 to-pink-500 rounded-full shadow-sm'></div>
           <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
-            前後隙間時間
+            隙間時間
           </h3>
         </div>
-        <div className='flex flex-wrap gap-3'>
-          {['0分', '15分', '30分', '45分', '60分'].map((buffer) => (
-            <button
-              key={buffer}
-              onClick={() => onBufferTimeChange(buffer)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-                bufferTime === buffer
-                  ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg transform scale-105'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
-              }`}
-            >
-              {buffer}
-            </button>
-          ))}
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>
+              前に空ける
+            </label>
+            <div className='flex flex-wrap gap-3'>
+              {['0分', '15分', '30分'].map((buffer) => (
+                <button
+                  key={`before-${buffer}`}
+                  onClick={() => onBufferTimeBeforeChange(buffer)}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${
+                    bufferTimeBefore === buffer
+                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg transform scale-105'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
+                  }`}
+                >
+                  {buffer}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>
+              後に空ける
+            </label>
+            <div className='flex flex-wrap gap-3'>
+              {['0分', '15分', '30分'].map((buffer) => (
+                <button
+                  key={`after-${buffer}`}
+                  onClick={() => onBufferTimeAfterChange(buffer)}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${
+                    bufferTimeAfter === buffer
+                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg transform scale-105'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
+                  }`}
+                >
+                  {buffer}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

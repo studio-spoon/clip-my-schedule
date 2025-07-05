@@ -11,7 +11,8 @@ interface ScheduleResultsProps {
   customTimeStart: string
   customTimeEnd: string
   meetingDuration: string
-  bufferTime: string
+  bufferTimeBefore: string
+  bufferTimeAfter: string
 }
 
 export default function ScheduleResults({
@@ -22,7 +23,8 @@ export default function ScheduleResults({
   customTimeStart,
   customTimeEnd,
   meetingDuration,
-  bufferTime
+  bufferTimeBefore,
+  bufferTimeAfter
 }: ScheduleResultsProps) {
   const [isCopied, setIsCopied] = useState(false)
   
@@ -41,7 +43,8 @@ export default function ScheduleResults({
     output += `期間: ${selectedPeriod}\n`
     output += `時間帯: ${timeRange}\n`
     output += `所要時間: ${meetingDuration}\n`
-    output += `前後隙間時間: ${bufferTime}\n\n`
+    output += `前に空ける時間: ${bufferTimeBefore}\n`
+    output += `後に空ける時間: ${bufferTimeAfter}\n\n`
     output += `【空き時間】\n`
 
     safeAvailableSlots.forEach((slot) => {

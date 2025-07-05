@@ -9,8 +9,11 @@ export interface ScheduleState {
   customTimeStart: string
   customTimeEnd: string
   meetingDuration: string
-  bufferTime: string
+  bufferTimeBefore: string
+  bufferTimeAfter: string
   customDuration: string
+  customPeriodStart: string
+  customPeriodEnd: string
 }
 
 export function useScheduleState() {
@@ -20,8 +23,11 @@ export function useScheduleState() {
   const [customTimeStart, setCustomTimeStart] = useState('10:00')
   const [customTimeEnd, setCustomTimeEnd] = useState('17:00')
   const [meetingDuration, setMeetingDuration] = useState('60分')
-  const [bufferTime, setBufferTime] = useState('30分')
+  const [bufferTimeBefore, setBufferTimeBefore] = useState('15分')
+  const [bufferTimeAfter, setBufferTimeAfter] = useState('15分')
   const [customDuration, setCustomDuration] = useState('75')
+  const [customPeriodStart, setCustomPeriodStart] = useState('')
+  const [customPeriodEnd, setCustomPeriodEnd] = useState('')
 
   const handleMemberToggle = (member: string) => {
     setSelectedMembers((prev) =>
@@ -46,8 +52,11 @@ export function useScheduleState() {
     customTimeStart,
     customTimeEnd,
     meetingDuration,
-    bufferTime,
-    customDuration
+    bufferTimeBefore,
+    bufferTimeAfter,
+    customDuration,
+    customPeriodStart,
+    customPeriodEnd
   }
 
   return {
@@ -61,8 +70,11 @@ export function useScheduleState() {
     setCustomTimeStart,
     setCustomTimeEnd,
     setMeetingDuration,
-    setBufferTime,
+    setBufferTimeBefore,
+    setBufferTimeAfter,
     setCustomDuration,
+    setCustomPeriodStart,
+    setCustomPeriodEnd,
     handleMemberToggle,
     setInitialMember,
     clearAll,
