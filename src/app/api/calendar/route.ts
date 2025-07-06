@@ -210,6 +210,7 @@ function calculateFreeSlots(
   const meetingDuration = params.meetingDuration
   const bufferTimeBefore = params.bufferTimeBefore
   const bufferTimeAfter = params.bufferTimeAfter
+  const totalSlotMinutes = params.totalSlotDuration
   
   console.log(`📊 Calculating free slots with parameters:`)
   console.log(`   Time range: ${start.toISOString()} to ${end.toISOString()}`)
@@ -217,6 +218,7 @@ function calculateFreeSlots(
   console.log(`   Meeting duration: ${meetingDuration} minutes`)
   console.log(`   Buffer time before: ${bufferTimeBefore} minutes`)
   console.log(`   Buffer time after: ${bufferTimeAfter} minutes`)
+  console.log(`   Total slot duration: ${totalSlotMinutes} minutes`)
   
   // タイムゾーン情報をログ出力（計算開始時）
   const calcNow = new Date()
@@ -235,94 +237,145 @@ function calculateFreeSlots(
     console.log(`\n📅 Processing date: ${date.toDateString()}`)
     console.log(`   Date details: ${date.toISOString()} (ISO), ${date.toString()} (toString)`)
     console.log(`   Day of week: ${date.getDay()} (0=Sunday, 6=Saturday)`)
-    const daySlots = []
     
-    const slotIncrement = 15; // 15分単位でチェック
-    const totalSlotMinutes = params.totalSlotDuration;
+    // 1. その日の全員のビジー時間を統合
+    const dayBusyPeriods = []
+    for (const { email, busy } of busyTimes) {
+      for (const { start: busyStart, end: busyEnd } of busy) {
+        const busyStartTime = new Date(busyStart)
+        const busyEndTime = new Date(busyEnd)
+        
+        // 同じ日付のビジー時間のみ取得
+        if (busyStartTime.toDateString() === date.toDateString() || 
+            busyEndTime.toDateString() === date.toDateString() ||
+            (busyStartTime <= date && busyEndTime >= date)) {
+          dayBusyPeriods.push({
+            start: busyStartTime,
+            end: busyEndTime,
+            email
+          })
+        }
+      }
+    }
     
-    // 指定された時間範囲内でスロットをチェック
-    for (let minute = workingHours.start * 60; minute <= workingHours.end * 60 - totalSlotMinutes; minute += slotIncrement) {
-      const slotStart = new Date(date)
-      slotStart.setHours(0, minute, 0, 0)
-      
-      const slotEnd = new Date(slotStart.getTime() + totalSlotMinutes * 60 * 1000)
-      
-      console.log(`  🕐 Checking slot ${slotStart.toLocaleTimeString()}-${slotEnd.toLocaleTimeString()}`)
-      
-      // 全員が空いているかチェック
-      let isSlotFree = true
-      const conflictDetails = []
-      
-      for (const { email, busy } of busyTimes) {
-        for (const { start: busyStart, end: busyEnd } of busy) {
-          const busyStartTime = new Date(busyStart)
-          const busyEndTime = new Date(busyEnd)
-          
-          // 修正: 同じ日付で比較するために時刻のみで比較
-          const slotStartTime = slotStart.getTime()
-          const slotEndTime = slotEnd.getTime()
-          const busyStartTimeStamp = busyStartTime.getTime()
-          const busyEndTimeStamp = busyEndTime.getTime()
-          
-          // 重複チェックの条件: 
-          // スロットの開始 < 予定の終了 AND スロットの終了 > 予定の開始
-          const hasConflict = (
-            slotStartTime < busyEndTimeStamp && slotEndTime > busyStartTimeStamp
-          )
-          
-          // 特別ケース: 重複や接触のチェック
-          // 隙間時間が0分の場合は、境界値での接触は許可する
-          // 隙間時間がある場合は、境界値での接触も競合とみなす
-          const isTouching = (
-            slotEndTime === busyStartTimeStamp || slotStartTime === busyEndTimeStamp
-          )
-          
-          // 隙間時間が0の場合は境界での接触を許可、隙間時間がある場合は禁止
-          const shouldAvoidTouching = bufferTimeBefore > 0 || bufferTimeAfter > 0
-          const finalHasConflict = hasConflict || (shouldAvoidTouching && isTouching)
-          
-          if (finalHasConflict) {
-            isSlotFree = false
-            conflictDetails.push({
-              email,
-              busyPeriod: `${busyStartTime.toISOString()} - ${busyEndTime.toISOString()}`,
-              slotPeriod: `${slotStart.toISOString()} - ${slotEnd.toISOString()}`,
-              reason: 'Time conflict'
-            })
-            console.log(`    ❌ CONFLICT with ${email}: busy ${busyStart} - ${busyEnd}`)
-          }
+    console.log(`   📋 Found ${dayBusyPeriods.length} busy periods for this date`)
+    dayBusyPeriods.forEach(period => {
+      console.log(`     • ${period.email}: ${period.start.toLocaleTimeString()} - ${period.end.toLocaleTimeString()}`)
+    })
+    
+    // 2. ビジー時間をソートして統合
+    const sortedBusyPeriods = dayBusyPeriods.sort((a, b) => a.start.getTime() - b.start.getTime())
+    const mergedBusyPeriods = []
+    
+    for (const period of sortedBusyPeriods) {
+      if (mergedBusyPeriods.length === 0) {
+        mergedBusyPeriods.push(period)
+      } else {
+        const lastPeriod = mergedBusyPeriods[mergedBusyPeriods.length - 1]
+        // 重複または隣接している場合は統合
+        if (period.start <= lastPeriod.end) {
+          lastPeriod.end = new Date(Math.max(lastPeriod.end.getTime(), period.end.getTime()))
+        } else {
+          mergedBusyPeriods.push(period)
+        }
+      }
+    }
+    
+    console.log(`   🔄 Merged into ${mergedBusyPeriods.length} busy periods`)
+    mergedBusyPeriods.forEach((period, index) => {
+      console.log(`     ${index + 1}. ${period.start.toLocaleTimeString()} - ${period.end.toLocaleTimeString()}`)
+    })
+    
+    // 3. 空き時間を計算
+    const freeSlots = []
+    
+    // その日の開始時刻と終了時刻を設定
+    const dayStart = new Date(date)
+    dayStart.setHours(0, 0, 0, 0)
+    const dayEnd = new Date(date)
+    dayEnd.setHours(23, 59, 59, 999)
+    
+    // 作業時間の範囲を設定
+    const workStart = new Date(date)
+    workStart.setHours(workingHours.start, 0, 0, 0)
+    const workEnd = new Date(date)
+    workEnd.setHours(workingHours.end, 0, 0, 0)
+    
+    console.log(`   🕐 Work hours: ${workStart.toLocaleTimeString()} - ${workEnd.toLocaleTimeString()}`)
+    
+    // 空き時間の候補を生成
+    let currentTime = new Date(Math.max(dayStart.getTime(), workStart.getTime()))
+    
+    for (const busyPeriod of mergedBusyPeriods) {
+      // 現在時刻からビジー時間の開始まで空いている場合
+      if (currentTime < busyPeriod.start) {
+        const freeStart = new Date(currentTime)
+        const freeEnd = new Date(busyPeriod.start)
+        
+        // 作業時間内の空き時間のみ
+        const effectiveFreeStart = new Date(Math.max(freeStart.getTime(), workStart.getTime()))
+        const effectiveFreeEnd = new Date(Math.min(freeEnd.getTime(), workEnd.getTime()))
+        
+        if (effectiveFreeStart < effectiveFreeEnd) {
+          freeSlots.push({
+            start: effectiveFreeStart,
+            end: effectiveFreeEnd,
+            durationMinutes: (effectiveFreeEnd.getTime() - effectiveFreeStart.getTime()) / 60000
+          })
         }
       }
       
-      if (isSlotFree) {
-        // 修正: 会議時間はslotStartから開始し、隙間時間は内部的に確保される
-        const meetingStart = new Date(slotStart);
-        const meetingEnd = new Date(meetingStart.getTime() + meetingDuration * 60 * 1000);
-        
-        // 実際に確保される全体の時間枠（デバッグ用）
-        const actualSlotEnd = new Date(slotStart.getTime() + totalSlotMinutes * 60 * 1000);
-
-        console.log(`    ✅ FREE slot:`)
-        console.log(`       Meeting time: ${meetingStart.toLocaleTimeString()}-${meetingEnd.toLocaleTimeString()} (${meetingDuration}min)`)
-        console.log(`       Buffer before: ${bufferTimeBefore}min, after: ${bufferTimeAfter}min`)
-        console.log(`       Total reserved: ${slotStart.toLocaleTimeString()}-${actualSlotEnd.toLocaleTimeString()} (${totalSlotMinutes}min)`)
-        
-        daySlots.push({
-          start: meetingStart.toISOString(),
-          end: meetingEnd.toISOString(),
-          time: `${meetingStart.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${meetingEnd.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`,
-          duration: meetingDuration,
-          bufferBefore: bufferTimeBefore,
-          bufferAfter: bufferTimeAfter,
-          // デバッグ用: 実際に確保される時間枠
-          debug: {
-            slotStart: slotStart.toISOString(),
-            slotEnd: actualSlotEnd.toISOString(),
-            totalDuration: totalSlotMinutes
-          }
+      // 次の開始時刻を更新
+      currentTime = new Date(Math.max(currentTime.getTime(), busyPeriod.end.getTime()))
+    }
+    
+    // 最後のビジー時間から作業終了時刻まで
+    if (currentTime < workEnd) {
+      const effectiveFreeStart = new Date(Math.max(currentTime.getTime(), workStart.getTime()))
+      const effectiveFreeEnd = new Date(workEnd)
+      
+      if (effectiveFreeStart < effectiveFreeEnd) {
+        freeSlots.push({
+          start: effectiveFreeStart,
+          end: effectiveFreeEnd,
+          durationMinutes: (effectiveFreeEnd.getTime() - effectiveFreeStart.getTime()) / 60000
         })
-      } else {
-        console.log(`    ❌ BUSY slot - conflicts:`, conflictDetails.length)
+      }
+    }
+    
+    console.log(`   🎯 Found ${freeSlots.length} free time slots`)
+    freeSlots.forEach((slot, index) => {
+      console.log(`     ${index + 1}. ${slot.start.toLocaleTimeString()} - ${slot.end.toLocaleTimeString()} (${slot.durationMinutes}min)`)
+    })
+    
+    // 4. 会議可能な時間帯を生成
+    const daySlots = []
+    
+    for (const freeSlot of freeSlots) {
+      // 必要な時間（会議時間 + 隙間時間）が確保できるかチェック
+      if (freeSlot.durationMinutes >= totalSlotMinutes) {
+        // 15分刻みで会議開始時刻の候補を生成
+        const slotStartTime = freeSlot.start.getTime()
+        const slotEndTime = freeSlot.end.getTime() - (totalSlotMinutes * 60 * 1000)
+        
+        for (let time = slotStartTime; time <= slotEndTime; time += 15 * 60 * 1000) {
+          const meetingStart = new Date(time + bufferTimeBefore * 60 * 1000)
+          const meetingEnd = new Date(meetingStart.getTime() + meetingDuration * 60 * 1000)
+          
+          daySlots.push({
+            start: meetingStart.toISOString(),
+            end: meetingEnd.toISOString(),
+            time: `${meetingStart.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${meetingEnd.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`,
+            duration: meetingDuration,
+            bufferBefore: bufferTimeBefore,
+            bufferAfter: bufferTimeAfter,
+            debug: {
+              freeSlot: `${freeSlot.start.toLocaleTimeString()} - ${freeSlot.end.toLocaleTimeString()}`,
+              freeSlotDuration: freeSlot.durationMinutes,
+              totalDuration: totalSlotMinutes
+            }
+          })
+        }
       }
     }
     
@@ -334,7 +387,7 @@ function calculateFreeSlots(
         weekday: 'short',
       })
       
-      console.log(`  📋 Adding ${daySlots.length} free slots for ${dateStr}`)
+      console.log(`  📋 Adding ${daySlots.length} meeting slots for ${dateStr}`)
       
       slots.push({
         date: dateStr,
@@ -345,14 +398,14 @@ function calculateFreeSlots(
             duration: slot.duration,
             bufferBefore: slot.bufferBefore,
             bufferAfter: slot.bufferAfter,
-            slotStart: slot.debug.slotStart,
-            slotEnd: slot.debug.slotEnd,
+            freeSlot: slot.debug.freeSlot,
+            freeSlotDuration: slot.debug.freeSlotDuration,
             totalDuration: slot.debug.totalDuration
           }))
         }
       })
     } else {
-      console.log(`  📋 No free slots found for this date`)
+      console.log(`  📋 No meeting slots found for this date`)
     }
   }
   
