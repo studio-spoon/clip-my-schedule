@@ -79,6 +79,15 @@ export async function GET(request: NextRequest) {
     console.log(`   Time range: ${timeMin} to ${timeMax}`)
     console.log(`   Emails: ${emails.join(', ')}`)
     console.log(`   Cache stats:`, getCacheStats())
+    
+    // タイムゾーン情報をログ出力
+    const now = new Date()
+    console.log(`🌍 Environment timezone info:`)
+    console.log(`   Current time: ${now.toISOString()} (ISO)`)
+    console.log(`   Current time: ${now.toString()} (toString)`)
+    console.log(`   Timezone offset: ${now.getTimezoneOffset()} minutes`)
+    console.log(`   Detected timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`)
+    console.log(`   Process timezone: ${process.env.TZ || 'not set'}`)
 
     // 複数のカレンダーから空き時間を取得
     const busyTimesPromises = emails.map(async (email) => {
@@ -209,6 +218,13 @@ function calculateFreeSlots(
   console.log(`   Buffer time before: ${bufferTimeBefore} minutes`)
   console.log(`   Buffer time after: ${bufferTimeAfter} minutes`)
   
+  // タイムゾーン情報をログ出力（計算開始時）
+  const calcNow = new Date()
+  console.log(`🌍 Calculation timezone info:`)
+  console.log(`   Calc start time: ${calcNow.toISOString()} (ISO)`)
+  console.log(`   Calc start time: ${calcNow.toString()} (toString)`)
+  console.log(`   Timezone offset: ${calcNow.getTimezoneOffset()} minutes`)
+  
   for (let date = new Date(start); date < end; date.setDate(date.getDate() + 1)) {
     // 土日をスキップ
     if (date.getDay() === 0 || date.getDay() === 6) {
@@ -217,6 +233,8 @@ function calculateFreeSlots(
     }
     
     console.log(`\n📅 Processing date: ${date.toDateString()}`)
+    console.log(`   Date details: ${date.toISOString()} (ISO), ${date.toString()} (toString)`)
+    console.log(`   Day of week: ${date.getDay()} (0=Sunday, 6=Saturday)`)
     const daySlots = []
     
     const slotIncrement = 15; // 15分単位でチェック
