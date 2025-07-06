@@ -1,11 +1,12 @@
 import { getServerSession } from "next-auth/next"
+import { Session } from "next-auth"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions) as any
+    const session: Session | null = await getServerSession(authOptions)
     
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         )
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Calendar access check failed:', error)
       

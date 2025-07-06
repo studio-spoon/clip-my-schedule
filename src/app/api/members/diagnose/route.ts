@@ -1,11 +1,12 @@
 import { getServerSession } from "next-auth/next"
+import { Session } from "next-auth"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions) as any
+    const session: Session | null = await getServerSession(authOptions)
     
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       userEmail: session.user.email,
       userDomain: userDomain,
       hasAccessToken: !!session.accessToken,
-      tests: {} as any
+      tests: {} as Record<string, any>
     }
 
     // Test 1: Admin SDK access
@@ -35,6 +36,7 @@ export async function GET(request: NextRequest) {
         maxResults: 1
       })
       diagnostics.tests.adminSDK = { success: true, message: 'Admin SDK access granted' }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       diagnostics.tests.adminSDK = { 
         success: false, 
@@ -53,6 +55,7 @@ export async function GET(request: NextRequest) {
         message: 'Calendar API access granted',
         calendarsFound: calendarList.data.items?.length || 0
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       diagnostics.tests.calendarAPI = { 
         success: false, 
@@ -73,6 +76,7 @@ export async function GET(request: NextRequest) {
         message: 'People API access granted',
         connectionsFound: connections.data.connections?.length || 0
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       diagnostics.tests.peopleAPI = { 
         success: false, 

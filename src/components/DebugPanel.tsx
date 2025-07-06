@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { Bug, ChevronDown, ChevronUp } from 'lucide-react'
+import { Member } from '@/types/api'
 
 interface DebugPanelProps {
-  teamMembers: any[]
+  teamMembers: Member[]
 }
 
 export default function DebugPanel({ teamMembers }: DebugPanelProps) {

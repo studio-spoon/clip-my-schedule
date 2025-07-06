@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth/next"
+import { Session } from "next-auth"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
@@ -8,7 +9,7 @@ import { processScheduleParams, validateScheduleParams, type ScheduleParams, typ
 export async function GET(request: NextRequest) {
   try {
     // セッション確認
-    const session = await getServerSession(authOptions) as any
+    const session: Session | null = await getServerSession(authOptions)
     
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -111,10 +112,10 @@ export async function GET(request: NextRequest) {
           console.warn(`⚠️ Calendar errors for ${email}:`, calendarErrors)
         }
         
-        const processedBusy = busyPeriods.map((period: any) => ({
+        const processedBusy = busyPeriods.map((period: { start?: string | null; end?: string | null }) => ({
           start: period.start || '',
           end: period.end || ''
-        })).filter((period: any) => period.start && period.end)
+        })).filter((period: { start: string; end: string }) => period.start && period.end)
         
         // キャッシュに保存
         setCachedCalendarData(email, timeMin, timeMax, processedBusy)
@@ -129,6 +130,7 @@ export async function GET(request: NextRequest) {
           errors: calendarErrors,
           source: 'api'
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error(`Error fetching calendar for ${email}:`, error)
         

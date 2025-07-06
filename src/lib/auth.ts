@@ -64,7 +64,7 @@ export const authOptions = {
       if (account && user) {
         return {
           accessToken: account.access_token,
-          accessTokenExpires: Date.now() + account.expires_in * 1000,
+          accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
           refreshToken: account.refresh_token,
           user: {
             id: user.id,
@@ -76,7 +76,7 @@ export const authOptions = {
       }
 
       // Return previous token if the access token has not expired yet
-      if (Date.now() < token.accessTokenExpires) {
+      if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
         return token
       }
 

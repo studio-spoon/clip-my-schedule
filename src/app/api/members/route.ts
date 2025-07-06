@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth/next"
+import { Session } from "next-auth"
 import { google } from "googleapis"
 import { NextRequest, NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
@@ -6,7 +7,7 @@ import { authOptions } from "@/lib/auth"
 export async function GET(request: NextRequest) {
   try {
     // セッション確認
-    const session = await getServerSession(authOptions) as any
+    const session: Session | null = await getServerSession(authOptions)
     
     console.log('Session check:', {
       hasSession: !!session,
@@ -121,6 +122,7 @@ export async function GET(request: NextRequest) {
             }
           }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('❌ Error fetching organization users:', {
           message: error.message,
@@ -188,6 +190,7 @@ export async function GET(request: NextRequest) {
             }
           }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('People API error:', error)
         console.log('People API access may not be granted or contacts are empty')

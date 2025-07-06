@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth/next"
+import { Session } from "next-auth"
 import { google } from "googleapis"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
@@ -6,7 +7,7 @@ import { authOptions } from "@/lib/auth"
 export async function GET() {
   try {
     // セッション確認
-    const session = await getServerSession(authOptions) as any
+    const session: Session | null = await getServerSession(authOptions)
     
     if (!session || !session.accessToken) {
       return NextResponse.json(
@@ -47,6 +48,7 @@ export async function GET() {
           primaryCalendar: testResponse.data.items?.[0]?.id || 'None'
         }
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (apiError: any) {
       console.error('Google Calendar API test failed:', apiError)
       

@@ -66,7 +66,7 @@ export function useAvailableSlots(
           const slots = result.data.freeSlots.map((daySlot) => ({
             date: daySlot.date,
             times: daySlot.times,
-            busyTimes: daySlot.debug?.slotDetails || []
+            busyTimes: daySlot.debug?.slotDetails?.map(d => ({ start: d.slotStart, end: d.slotEnd })) || []
           }))
           
           setAvailableSlots(slots)
