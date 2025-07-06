@@ -47,7 +47,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: "openid email profile https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.freebusy",
+          scope: "openid email profile https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.freebusy https://www.googleapis.com/auth/admin.directory.user.readonly",
           access_type: "offline",
           prompt: "consent",
         },

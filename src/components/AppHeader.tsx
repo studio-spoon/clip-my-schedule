@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { Calendar, LogOut, Sun, Moon, Monitor } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
-import { Session } from 'next-auth'
-import { useSession } from 'next-auth/react'
+import { Calendar, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 
 // ...
 
 interface AppHeaderProps {
-  session: ReturnType<typeof useSession>['data']
-  onLogout: () => void
+  session: ReturnType<typeof useSession>['data'];
+  onLogout: () => void;
 }
 
 export default function AppHeader({ session, onLogout }: AppHeaderProps) {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className='mb-8 flex items-center justify-between'>
@@ -23,10 +23,10 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
         </div>
         <div>
           <h1 className='text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent'>
-            Clip My Schedule
+            Time Clipper
           </h1>
           <p className='text-gray-600 dark:text-gray-400 text-sm'>
-            簡単スケジュール調整
+            空き時間候補リストの作成
           </p>
         </div>
       </div>
@@ -35,7 +35,10 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
         {/* ユーザー情報 */}
         <div className='flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-700'>
           <img
-            src={session?.user?.image || 'https://via.placeholder.com/32x32/4F46E5/FFFFFF?text=U'}
+            src={
+              session?.user?.image ||
+              'https://via.placeholder.com/32x32/4F46E5/FFFFFF?text=U'
+            }
             alt={session?.user?.name || 'User'}
             className='w-8 h-8 rounded-full'
           />
@@ -92,5 +95,5 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

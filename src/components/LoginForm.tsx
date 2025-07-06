@@ -1,22 +1,21 @@
-'use client'
+'use client';
 
-import { signIn } from 'next-auth/react'
-import { Calendar, Shield } from 'lucide-react'
+import { signIn } from 'next-auth/react';
+import { Calendar, Shield } from 'lucide-react';
 
 interface LoginFormProps {
-  isLoading: boolean
+  isLoading: boolean;
 }
 
 export default function LoginForm({ isLoading }: LoginFormProps) {
   const handleGoogleLogin = () => {
-    signIn('google')
-  }
+    signIn('google');
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+    <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
       <div className='min-h-screen flex items-center justify-center p-4'>
         <div className='max-w-md w-full'>
-
           {/* ログインカード */}
           <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 backdrop-blur-sm'>
             {/* ロゴとタイトル */}
@@ -25,10 +24,10 @@ export default function LoginForm({ isLoading }: LoginFormProps) {
                 <Calendar className='w-12 h-12 text-white' />
               </div>
               <h1 className='text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2'>
-                Clip My Schedule
+                Time Clipper
               </h1>
               <p className='text-gray-600 dark:text-gray-400'>
-                簡単スケジュール調整
+                空き時間候補リストの作成
               </p>
             </div>
 
@@ -115,5 +114,5 @@ export default function LoginForm({ isLoading }: LoginFormProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-# Clip My Schedule
+# Time Clipper
 
 ## 概要
 
-Googleカレンダー連携による簡単スケジュール調整アプリです。  
+Google カレンダー連携による空き時間候補リストの作成アプリです。  
 チームメンバーの空き時間を素早く検索・共有し、効率的な会議設定をサポートします。
 
 ## 主な機能
 
-- 🔐 **Google OAuth認証** - 誰でも利用可能なGoogleアカウントログイン
+- 🔐 **Google OAuth 認証** - 誰でも利用可能な Google アカウントログイン
 - 📅 **スケジュール検索** - 複数メンバーの空き時間を一括検索
 - 🎨 **テーマ切り替え** - ライト/ダーク/システム連動
 - 📱 **レスポンシブデザイン** - PC・スマホ対応
@@ -42,11 +42,11 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_nextauth_secret
 ```
 
-### 3. Google OAuth設定
+### 3. Google OAuth 設定
 
 1. [Google Cloud Console](https://console.cloud.google.com/)でプロジェクトを作成
-2. **APIs & Services > Credentials**でOAuth 2.0クライアントIDを作成
-3. 承認済みリダイレクトURIに追加：
+2. **APIs & Services > Credentials**で OAuth 2.0 クライアント ID を作成
+3. 承認済みリダイレクト URI に追加：
    - `http://localhost:3000/api/auth/callback/google`
    - `https://yourdomain.com/api/auth/callback/google`
 
@@ -68,7 +68,7 @@ npm run lint
 
 ## 使用方法
 
-1. **ログイン**: Googleアカウントでログイン
+1. **ログイン**: Google アカウントでログイン
 2. **参加者選択**: 空き時間を確認したいメンバーを選択
 3. **条件設定**: 開催時期・時間帯・所要時間を設定
 4. **検索実行**: 空き時間を検索ボタンをクリック
@@ -94,16 +94,16 @@ src/
 
 ## TODO
 
-- [ ] Google OAuth認証の完全実装
-- [ ] Google Calendar API連携
-- [ ] TypeScriptインターフェース改善
+- [ ] Google OAuth 認証の完全実装
+- [ ] Google Calendar API 連携
+- [ ] TypeScript インターフェース改善
 - [ ] ドメイン制限の実装
 - [ ] エラーハンドリング強化
 - [ ] ローディング状態の改善
 
 ## サポート
 
-開発に関する質問やバグ報告は、プロジェクトのIssuesページまでお願いします。
+開発に関する質問やバグ報告は、プロジェクトの Issues ページまでお願いします。
 
 ---
 

@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
       displayName: `${session.user.name || session.user.email.split('@')[0]} (あなた)`,
       calendarId: session.user.email,
       accessRole: 'owner',
-      source: 'self'
+      source: 'self',
+      photo: session.user.image
     })
 
     // 1. 共有カレンダーメンバーを取得
@@ -115,7 +116,8 @@ export async function GET(request: NextRequest) {
                 displayName: `${displayName} (${user.primaryEmail})`,
                 calendarId: user.primaryEmail,
                 accessRole: 'organization',
-                source: 'organization'
+                source: 'organization',
+                photo: user.thumbnailPhotoUrl
               })
               
               console.log(`Added organization member: ${displayName} (${user.primaryEmail})`)
@@ -181,7 +183,8 @@ export async function GET(request: NextRequest) {
                     displayName: `${name} (${email})`,
                     calendarId: email,
                     accessRole: 'organization',
-                    source: 'organization'
+                    source: 'organization',
+                    photo: contact.photos?.[0]?.url
                   })
                   
                   console.log(`Added organization contact: ${name} (${email})`)

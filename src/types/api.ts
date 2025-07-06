@@ -12,6 +12,7 @@ export interface Member {
   calendarId: string
   accessRole: string
   source: 'self' | 'shared' | 'organization'
+  photo?: string
 }
 
 export interface CalendarSlot {

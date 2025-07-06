@@ -1,4 +1,4 @@
-# Clip My Schedule
+# Time Clipper
 
 ## Project Overview
 
