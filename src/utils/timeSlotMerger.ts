@@ -124,7 +124,7 @@ export function mergeConsecutiveTimeSlots(timeSlots: string[]): MergedTimeSlot[]
  * マージされた時間枠を表示用文字列に変換
  */
 export function formatMergedTimeSlot(slot: MergedTimeSlot): string {
-  return `${slot.start} - ${slot.end} (${slot.duration})`
+  return `${slot.start} - ${slot.end}`
 }
 
 /**

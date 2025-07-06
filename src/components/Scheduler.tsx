@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useMembers } from '@/hooks/useMembers';
 import { useScheduleState } from '@/hooks/useScheduleState';
@@ -77,13 +77,30 @@ function SchedulerContent() {
   };
 
   // 設定変更時の自動再検索
-  useEffect(() => {
-    if (hasSearched && scheduleState.selectedMembers.length > 0) {
-      const timeoutId = setTimeout(() => {
-        handleSearch();
-      }, 500); // 500ms の debounce
+  const prevSearchParams = useRef<any>(null);
 
-      return () => clearTimeout(timeoutId);
+  useEffect(() => {
+    const currentParams = {
+      selectedMembers: scheduleState.selectedMembers,
+      selectedPeriod: scheduleState.selectedPeriod,
+      selectedTimeSlot: scheduleState.selectedTimeSlot,
+      customTimeStart: scheduleState.customTimeStart,
+      customTimeEnd: scheduleState.customTimeEnd,
+      meetingDuration: scheduleState.meetingDuration,
+      bufferTimeBefore: scheduleState.bufferTimeBefore,
+      bufferTimeAfter: scheduleState.bufferTimeAfter,
+      customDuration: scheduleState.customDuration,
+      customPeriodStart: scheduleState.customPeriodStart,
+      customPeriodEnd: scheduleState.customPeriodEnd,
+    };
+
+    // 検索条件が変わったときだけ検索
+    if (
+      hasSearched &&
+      JSON.stringify(prevSearchParams.current) !== JSON.stringify(currentParams)
+    ) {
+      prevSearchParams.current = currentParams;
+      handleSearch();
     }
   }, [
     scheduleState.selectedMembers,
