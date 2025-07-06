@@ -11,6 +11,7 @@ import MemberSelection from '@/components/MemberSelection';
 import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleResults from '@/components/ScheduleResults';
 import DebugPanel from '@/components/DebugPanel';
+import Footer from '@/components/Footer';
 import { Member } from '@/types/api';
 
 function SchedulerContent() {
@@ -202,6 +203,9 @@ function SchedulerContent() {
               />
             </div>
           </div>
+
+          {/* フッター */}
+          <Footer />
         </div>
       </div>
 

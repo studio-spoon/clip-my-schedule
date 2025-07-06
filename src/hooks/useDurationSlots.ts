@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { api } from '@/services/api'
-import type { Member } from '@/types/api'
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
+import type { Member } from '@/types/api';
 
 interface DurationSlot {
-  date: string
-  times: string[]
+  date: string;
+  times: string[];
   debug?: {
     slotDetails?: Array<{
-      time: string
-      duration: number
-      bufferBefore: number
-      bufferAfter: number
-      slotStart: string
-      slotEnd: string
-      totalDuration: number
-    }>
-  }
+      time: string;
+      duration: number;
+      bufferBefore: number;
+      bufferAfter: number;
+      slotStart: string;
+      slotEnd: string;
+      totalDuration: number;
+    }>;
+  };
 }
 
 interface UseDurationSlotsParams {
-  selectedMembers: string[]
-  teamMembers: Member[]
-  selectedPeriod: string
-  customPeriodStart: string
-  customPeriodEnd: string
-  selectedTimeSlot: string
-  customTimeStart: string
-  customTimeEnd: string
-  meetingDuration: string
-  customDuration: string
+  selectedMembers: string[];
+  teamMembers: Member[];
+  selectedPeriod: string;
+  customPeriodStart: string;
+  customPeriodEnd: string;
+  selectedTimeSlot: string;
+  customTimeStart: string;
+  customTimeEnd: string;
+  meetingDuration: string;
+  customDuration: string;
 }
 
 export function useDurationSlots({
@@ -43,143 +43,160 @@ export function useDurationSlots({
   customTimeStart,
   customTimeEnd,
   meetingDuration,
-  customDuration
+  customDuration,
 }: UseDurationSlotsParams) {
-  const [durationSlots, setDurationSlots] = useState<DurationSlot[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [durationSlots, setDurationSlots] = useState<DurationSlot[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedMembers.length === 0) {
-      setDurationSlots([])
-      return
+      setDurationSlots([]);
+      return;
     }
 
     const fetchDurationSlots = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
         // 期間の計算（他のhookと同じロジック）
-        let timeMin: Date
-        let timeMax: Date
+        let timeMin: Date;
+        let timeMax: Date;
 
         if (selectedPeriod === '直近1週間') {
-          timeMin = new Date()
-          timeMax = new Date()
-          timeMax.setDate(timeMax.getDate() + 7)
+          timeMin = new Date();
+          timeMax = new Date();
+          timeMax.setDate(timeMax.getDate() + 7);
         } else if (selectedPeriod === '直近2週間') {
-          timeMin = new Date()
-          timeMax = new Date()
-          timeMax.setDate(timeMax.getDate() + 14)
+          timeMin = new Date();
+          timeMax = new Date();
+          timeMax.setDate(timeMax.getDate() + 14);
         } else if (selectedPeriod === '期間を指定') {
           if (!customPeriodStart || !customPeriodEnd) {
-            console.log('期間指定が選択されていますが、開始日または終了日が未入力です。')
-            setDurationSlots([])
-            setIsLoading(false)
-            return
+            console.log(
+              '期間指定が選択されていますが、開始日または終了日が未入力です。'
+            );
+            setDurationSlots([]);
+            setIsLoading(false);
+            return;
           }
-          timeMin = new Date(customPeriodStart)
-          timeMax = new Date(customPeriodEnd)
-          timeMax.setHours(23, 59, 59, 999) // 終了日の終わりまで
+          timeMin = new Date(customPeriodStart);
+          timeMax = new Date(customPeriodEnd);
+          timeMax.setHours(23, 59, 59, 999); // 終了日の終わりまで
         } else {
           // デフォルトは直近1週間
-          timeMin = new Date()
-          timeMax = new Date()
-          timeMax.setDate(timeMax.getDate() + 7)
+          timeMin = new Date();
+          timeMax = new Date();
+          timeMax.setDate(timeMax.getDate() + 7);
         }
 
         // 時間帯の処理
-        let workingTimeStart = '10:00'
-        let workingTimeEnd = '18:00'
-        
+        let workingTimeStart = '10:00';
+        let workingTimeEnd = '18:00';
+
         if (selectedTimeSlot === 'デフォルト') {
-          workingTimeStart = '10:00'
-          workingTimeEnd = '17:00'
+          workingTimeStart = '10:00';
+          workingTimeEnd = '17:00';
         } else if (selectedTimeSlot === '時間指定') {
-          workingTimeStart = customTimeStart || '10:00'
-          workingTimeEnd = customTimeEnd || '18:00'
+          workingTimeStart = customTimeStart || '10:00';
+          workingTimeEnd = customTimeEnd || '18:00';
         }
 
         // 参加者のカレンダーIDを抽出
-        const emails = selectedMembers.map(memberDisplayName => {
-          const member = teamMembers.find(m => m.displayName === memberDisplayName)
-          return member ? member.calendarId : ''
-        }).filter(email => email)
+        const emails = selectedMembers
+          .map((memberDisplayName) => {
+            const member = teamMembers.find(
+              (m) => m.displayName === memberDisplayName
+            );
+            return member ? member.calendarId : '';
+          })
+          .filter((email) => email);
 
-        console.log('🔍 Fetching duration slots:')
-        console.log('   Selected period:', selectedPeriod)
-        console.log('   Time range:', timeMin.toISOString(), 'to', timeMax.toISOString())
-        console.log('   Selected time slot:', selectedTimeSlot)
-        console.log('   Working hours:', workingTimeStart, '-', workingTimeEnd)
-        console.log('   Meeting duration:', meetingDuration)
-        console.log('   Custom duration:', customDuration)
-        console.log('   Members:', selectedMembers)
-        console.log('   Email addresses:', emails)
+        console.log('🔍 Fetching duration slots:');
+        console.log('   Selected period:', selectedPeriod);
+        console.log(
+          '   Time range:',
+          timeMin.toISOString(),
+          'to',
+          timeMax.toISOString()
+        );
+        console.log('   Selected time slot:', selectedTimeSlot);
+        console.log('   Working hours:', workingTimeStart, '-', workingTimeEnd);
+        console.log('   Meeting duration:', meetingDuration);
+        console.log('   Custom duration:', customDuration);
+        console.log('   Members:', selectedMembers);
+        console.log('   Email addresses:', emails);
 
-        // Calendar APIを呼び出し（期間・時間帯・所要時間を反映、隙間時間は0分）
-        const result = await api.calendar.searchAvailableSlots({
-          timeMin: timeMin.toISOString(),
-          timeMax: timeMax.toISOString(),
-          emails
-        }, {
-          selectedPeriod,
-          selectedTimeSlot,
-          customTimeStart: workingTimeStart,
-          customTimeEnd: workingTimeEnd,
-          meetingDuration,
-          bufferTimeBefore: '0分', // 隙間時間は含めない
-          bufferTimeAfter: '0分',  // 隙間時間は含めない
-          customDuration,
-          customPeriodStart,
-          customPeriodEnd
-        })
+        // Calendar APIを呼び出し（期間・時間帯・所要時間を反映、前後余白は0分）
+        const result = await api.calendar.searchAvailableSlots(
+          {
+            timeMin: timeMin.toISOString(),
+            timeMax: timeMax.toISOString(),
+            emails,
+          },
+          {
+            selectedPeriod,
+            selectedTimeSlot,
+            customTimeStart: workingTimeStart,
+            customTimeEnd: workingTimeEnd,
+            meetingDuration,
+            bufferTimeBefore: '0分', // 前後余白は含めない
+            bufferTimeAfter: '0分', // 前後余白は含めない
+            customDuration,
+            customPeriodStart,
+            customPeriodEnd,
+          }
+        );
 
         if (result.success && result.data) {
           // APIレスポンスを変換
           const slots = result.data.freeSlots.map((daySlot) => ({
             date: daySlot.date,
             times: daySlot.times,
-            debug: daySlot.debug
-          }))
-          
-          console.log('✅ Duration slots fetched:', slots)
-          setDurationSlots(slots)
+            debug: daySlot.debug,
+          }));
+
+          console.log('✅ Duration slots fetched:', slots);
+          setDurationSlots(slots);
         } else {
-          throw new Error(result.error || 'カレンダー情報の取得に失敗しました')
+          throw new Error(result.error || 'カレンダー情報の取得に失敗しました');
         }
       } catch (error) {
-        console.error('Duration slots fetch error:', error)
-        const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました。'
-        setError(errorMessage)
-        setDurationSlots([])
+        console.error('Duration slots fetch error:', error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : '不明なエラーが発生しました。';
+        setError(errorMessage);
+        setDurationSlots([]);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     // デバウンス処理（300ms）
     const timeoutId = setTimeout(() => {
-      fetchDurationSlots()
-    }, 300)
+      fetchDurationSlots();
+    }, 300);
 
-    return () => clearTimeout(timeoutId)
+    return () => clearTimeout(timeoutId);
   }, [
-    selectedMembers, 
-    teamMembers, 
-    selectedPeriod, 
-    customPeriodStart, 
+    selectedMembers,
+    teamMembers,
+    selectedPeriod,
+    customPeriodStart,
     customPeriodEnd,
     selectedTimeSlot,
     customTimeStart,
     customTimeEnd,
     meetingDuration,
-    customDuration
-  ])
+    customDuration,
+  ]);
 
   return {
     durationSlots,
     isLoading,
-    error
-  }
+    error,
+  };
 }

@@ -27,7 +27,7 @@ export default function LoginForm({ isLoading }: LoginFormProps) {
                 Time Clipper
               </h1>
               <p className='text-gray-600 dark:text-gray-400'>
-                空き時間候補リストの作成
+                Googleカレンダーの空き時間候補を簡単リストアップ
               </p>
             </div>
 

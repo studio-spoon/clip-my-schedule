@@ -1,5 +1,7 @@
-
-import { processScheduleParams, validateScheduleParams } from './schedule-processor';
+import {
+  processScheduleParams,
+  validateScheduleParams,
+} from './schedule-processor';
 
 describe('schedule-processor', () => {
   describe('processScheduleParams', () => {
@@ -35,8 +37,12 @@ describe('schedule-processor', () => {
       };
       const result = validateScheduleParams(params);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('前の隙間時間は0以上である必要があります');
-      expect(result.warnings).toContain('後の隙間時間が非常に長く設定されています');
+      expect(result.errors).toContain(
+        '前の前後余白は0以上である必要があります'
+      );
+      expect(result.warnings).toContain(
+        '後の前後余白が非常に長く設定されています'
+      );
     });
   });
 });

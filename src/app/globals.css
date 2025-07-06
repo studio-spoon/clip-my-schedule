@@ -11,13 +11,16 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --dark-mode: "class";
+  --color-card: light-dark(#ffffff, #1f2937);
+  --color-card-foreground: light-dark(#171717, #f9fafb);
+  --color-muted: light-dark(#f8fafc, #374151);
+  --color-muted-foreground: light-dark(#64748b, #9ca3af);
+  --color-border: light-dark(#e2e8f0, #4b5563);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {

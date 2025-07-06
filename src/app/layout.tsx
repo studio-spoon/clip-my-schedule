@@ -5,7 +5,7 @@ import { Providers } from '@/components/Providers';
 export const metadata: Metadata = {
   title: 'Time Clipper',
   description:
-    '空き時間候補リストの作成アプリ - Googleカレンダー連携でチームの空き時間を素早く検索',
+    '『Time Clipper』はGoogleカレンダーの空き時間候補をリストアップしてくれるアプリです。自分自身のみならず、チームメンバーの空き時間を素早く検索・共有し、効率的な会議設定をサポートします。',
 };
 
 export default function RootLayout({

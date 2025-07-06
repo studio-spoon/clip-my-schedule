@@ -116,7 +116,7 @@ export default function MemberSelection({
           参加者を選択
         </h2>
         <span className='text-sm text-gray-500 dark:text-gray-400'>
-          {isLoading ? '読み込み中...' : `${teamMembers.length}名から選択`}
+          {isLoading ? '読み込み中...' : `${teamMembers.length}名から選択可能`}
         </span>
       </div>
 

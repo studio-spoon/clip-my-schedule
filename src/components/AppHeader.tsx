@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import { Calendar, LogOut, Sun, Moon, Monitor, Settings } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
@@ -26,14 +26,17 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
             Time Clipper
           </h1>
           <p className='text-gray-600 dark:text-gray-400 text-sm'>
-            空き時間候補リストの作成
+            Googleカレンダーの空き時間候補を簡単リストアップ
           </p>
         </div>
       </div>
 
       <div className='flex items-center gap-4'>
         {/* ユーザー情報 */}
-        <div className='flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-700'>
+        <a
+          href='/mypage'
+          className='flex items-center gap-3 bg-white dark:bg-gray-800 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+        >
           <img
             src={
               session?.user?.image ||
@@ -50,7 +53,16 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
               {session?.user?.email}
             </p>
           </div>
-        </div>
+        </a>
+
+        {/* マイページボタン */}
+        <a
+          href='/mypage'
+          className='p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-blue-500 transition-colors'
+          title='マイページ'
+        >
+          <Settings className='w-5 h-5' />
+        </a>
 
         {/* テーマ切り替え */}
         <div className='flex items-center gap-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg border border-gray-200 dark:border-gray-700'>
