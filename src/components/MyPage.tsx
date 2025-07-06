@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { Settings, Save, RotateCcw, Download, Upload, History, Star, Clock, Sun, Moon, Laptop, ArrowLeft } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import UserAvatar from '@/components/UserAvatar';
@@ -75,13 +76,13 @@ export default function MyPage() {
         </div>
         
         {/* 戻るボタン */}
-        <a
+        <Link
           href="/"
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="hidden sm:inline">アプリに戻る</span>
-        </a>
+        </Link>
       </div>
 
       {error && (
@@ -97,7 +98,7 @@ export default function MyPage() {
             <UserAvatar
               name={session.user?.name || 'ユーザー'}
               email={session.user?.email || ''}
-              photo={session.user?.image}
+              photo={session.user?.image || undefined}
               source="self"
               size="lg"
             />
