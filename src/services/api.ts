@@ -72,8 +72,11 @@ export const calendarApi = {
       customTimeStart?: string
       customTimeEnd?: string
       meetingDuration?: string
-      bufferTime?: string
+      bufferTimeBefore?: string
+      bufferTimeAfter?: string
       customDuration?: string
+      customPeriodStart?: string
+      customPeriodEnd?: string
     }
   ): Promise<ApiResponse<ScheduleSearchResult>> {
     const searchParams = new URLSearchParams({

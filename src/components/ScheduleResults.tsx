@@ -2,9 +2,26 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { mergeDaySlots, formatMergedTimeSlot } from '@/utils/timeSlotMerger'
+
+interface ScheduleSlot {
+  date: string
+  times: string[]
+  debug?: {
+    slotDetails?: Array<{
+      time: string
+      duration: number
+      bufferBefore: number
+      bufferAfter: number
+      slotStart: string
+      slotEnd: string
+      totalDuration: number
+    }>
+  }
+}
 
 interface ScheduleResultsProps {
-  availableSlots?: {date: string, times: string[]}[]
+  availableSlots?: ScheduleSlot[]
   selectedMembers: string[]
   selectedPeriod: string
   selectedTimeSlot: string
@@ -27,6 +44,7 @@ export default function ScheduleResults({
   bufferTimeAfter
 }: ScheduleResultsProps) {
   const [isCopied, setIsCopied] = useState(false)
+  const [showDebug, setShowDebug] = useState(true) // デバッグ情報を表示
   
   // 安全なデフォルト値
   const safeAvailableSlots = availableSlots || []
@@ -47,10 +65,10 @@ export default function ScheduleResults({
     output += `後に空ける時間: ${bufferTimeAfter}\n\n`
     output += `【空き時間】\n`
 
-    safeAvailableSlots.forEach((slot) => {
+    mergeDaySlots(safeAvailableSlots).forEach((slot) => {
       output += `${slot.date}\n`
-      slot.times.forEach((time) => {
-        output += `  ・${time}\n`
+      slot.mergedTimes.forEach((time) => {
+        output += `  ・${formatMergedTimeSlot(time)}\n`
       })
       output += '\n'
     })
@@ -80,28 +98,54 @@ export default function ScheduleResults({
 
       {/* 空き時間リスト */}
       <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl p-6 mb-6 border border-gray-200 dark:border-gray-600'>
-        <h4 className='text-lg font-semibold text-gray-800 dark:text-white mb-4'>
-          空き時間一覧
-        </h4>
+        <div className='flex items-center justify-between mb-4'>
+          <h4 className='text-lg font-semibold text-gray-800 dark:text-white'>
+            空き時間一覧
+          </h4>
+          <button
+            onClick={() => setShowDebug(!showDebug)}
+            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+              showDebug
+                ? 'bg-yellow-500 text-white shadow-md'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500'
+            }`}
+          >
+            {showDebug ? '🔧 デバッグ表示中' : '🔧 デバッグ表示'}
+          </button>
+        </div>
         <div className='space-y-4'>
-          {safeAvailableSlots.map((slot, index) => (
+          {mergeDaySlots(safeAvailableSlots).map((slot, index) => (
             <div
               key={index}
               className='bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700'
             >
-              <div className='font-semibold text-gray-900 dark:text-white mb-3'>
+              <div className='font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2'>
                 {slot.date}
-              </div>
-              <div className='flex flex-wrap gap-2'>
-                {slot.times.map((time, timeIndex) => (
-                  <span
-                    key={timeIndex}
-                    className='bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-lg text-sm font-medium shadow-sm'
-                  >
-                    {time}
+                {slot.originalCount > 0 && (
+                  <span className='text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded'>
+                    {slot.originalCount}個の時間枠から統合
                   </span>
+                )}
+              </div>
+              <div className='space-y-2'>
+                {slot.mergedTimes.map((time, timeIndex) => (
+                  <div
+                    key={timeIndex}
+                    className='bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-sm'
+                  >
+                    {formatMergedTimeSlot(time)}
+                  </div>
                 ))}
               </div>
+              {showDebug && (
+                <div className='mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
+                  <div className='text-xs text-gray-600 dark:text-gray-400 font-medium mb-2'>🔧 デバッグ情報:</div>
+                  <div className='text-xs text-gray-600 dark:text-gray-400'>
+                    元の時間枠数: {slot.originalCount}個<br />
+                    統合後: {slot.mergedTimes.length}個の連続した空き時間
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

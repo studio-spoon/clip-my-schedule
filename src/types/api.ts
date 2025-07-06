@@ -17,6 +17,17 @@ export interface Member {
 export interface CalendarSlot {
   date: string
   times: string[]
+  debug?: {
+    slotDetails?: Array<{
+      time: string
+      duration: number
+      bufferBefore: number
+      bufferAfter: number
+      slotStart: string
+      slotEnd: string
+      totalDuration: number
+    }>
+  }
 }
 
 export interface CalendarSearchParams {

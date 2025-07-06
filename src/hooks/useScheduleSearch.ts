@@ -11,7 +11,8 @@ interface ScheduleSearchParams {
   customTimeStart: string
   customTimeEnd: string
   meetingDuration: string
-  bufferTime: string
+  bufferTimeBefore: string
+  bufferTimeAfter: string
   customDuration: string
   customPeriodStart: string
   customPeriodEnd: string
@@ -53,7 +54,8 @@ export function useScheduleSearch() {
     customTimeStart,
     customTimeEnd,
     meetingDuration,
-    bufferTime,
+    bufferTimeBefore,
+    bufferTimeAfter,
     customDuration,
     customPeriodStart,
     customPeriodEnd,
@@ -67,7 +69,8 @@ export function useScheduleSearch() {
     console.log('   customTimeStart:', customTimeStart)
     console.log('   customTimeEnd:', customTimeEnd)
     console.log('   meetingDuration:', meetingDuration)
-    console.log('   bufferTime:', bufferTime)
+    console.log('   bufferTimeBefore:', bufferTimeBefore)
+    console.log('   bufferTimeAfter:', bufferTimeAfter)
     console.log('   customDuration:', customDuration)
     console.log('   customPeriodStart:', customPeriodStart)
     console.log('   customPeriodEnd:', customPeriodEnd)
@@ -127,7 +130,8 @@ export function useScheduleSearch() {
         customTimeStart,
         customTimeEnd,
         meetingDuration,
-        bufferTime,
+        bufferTimeBefore,
+        bufferTimeAfter,
         customDuration,
         customPeriodStart,
         customPeriodEnd,

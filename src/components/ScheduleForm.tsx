@@ -1,6 +1,7 @@
 'use client'
 
 import { Clock, Settings } from 'lucide-react'
+import { useRef } from 'react'
 
 interface ScheduleFormProps {
   selectedPeriod: string
@@ -53,6 +54,10 @@ export default function ScheduleForm({
   onCustomPeriodEndChange,
   onSearch
 }: ScheduleFormProps) {
+  
+  // カスタム所要時間input要素への参照
+  const customDurationInputRef = useRef<HTMLInputElement>(null)
+  
   return (
     <>
       {/* 開催時期 */}
@@ -114,6 +119,7 @@ export default function ScheduleForm({
         )}
       </div>
 
+
       {/* 時間帯 */}
       <div className='mb-8'>
         <div className='flex items-center gap-3 mb-4'>
@@ -126,6 +132,7 @@ export default function ScheduleForm({
             マイページでデフォルトの時間帯を設定
           </span>
         </div>
+        
         <div className='flex flex-wrap gap-3 mb-4'>
           <button
             onClick={() => onTimeSlotChange('デフォルト')}
@@ -141,7 +148,10 @@ export default function ScheduleForm({
             </div>
           </button>
           <button
-            onClick={() => onTimeSlotChange('時間指定')}
+            onClick={() => {
+              console.log('🔘 時間指定ボタンがクリックされました')
+              onTimeSlotChange('時間指定')
+            }}
             className={`px-6 py-4 rounded-xl font-medium transition-all duration-200 ${
               selectedTimeSlot === '時間指定'
                 ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg'
@@ -173,6 +183,7 @@ export default function ScheduleForm({
         )}
       </div>
 
+
       {/* 所要時間 */}
       <div className='mb-8'>
         <div className='flex items-center gap-3 mb-4'>
@@ -195,22 +206,58 @@ export default function ScheduleForm({
               {duration}
             </button>
           ))}
-          <div className='flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600'>
-            <span className='text-sm text-gray-600 dark:text-gray-400'>
+          <div 
+            className={`flex items-center gap-2 p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+              meetingDuration === 'カスタム'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-transparent shadow-lg transform scale-105'
+                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => {
+              // div全体をクリックしたときにカスタムモードに切り替える
+              onMeetingDurationChange('カスタム')
+              // input要素にフォーカスも移す
+              if (customDurationInputRef.current) {
+                customDurationInputRef.current.focus()
+              }
+            }}
+          >
+            <span className={`text-sm ${
+              meetingDuration === 'カスタム'
+                ? 'text-white'
+                : 'text-gray-600 dark:text-gray-400'
+            }`}>
               時間指定
             </span>
             <input
+              ref={customDurationInputRef}
               type='number'
               value={customDuration}
-              onChange={(e) => onCustomDurationChange(e.target.value)}
-              className='w-16 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+              onChange={(e) => {
+                onCustomDurationChange(e.target.value)
+                // カスタム値が変更されたらmeetingDurationも更新
+                onMeetingDurationChange('カスタム')
+              }}
+              onFocus={() => {
+                // フォーカス時にもカスタムモードに切り替え
+                onMeetingDurationChange('カスタム')
+              }}
+              className={`w-16 border rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                meetingDuration === 'カスタム'
+                  ? 'border-white/30 bg-white/20 text-white placeholder-white/60'
+                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+              }`}
             />
-            <span className='text-sm text-gray-600 dark:text-gray-400'>
+            <span className={`text-sm ${
+              meetingDuration === 'カスタム'
+                ? 'text-white'
+                : 'text-gray-600 dark:text-gray-400'
+            }`}>
               分
             </span>
           </div>
         </div>
       </div>
+
 
       {/* 隙間時間 */}
       <div className='mb-8'>
@@ -263,6 +310,7 @@ export default function ScheduleForm({
           </div>
         </div>
       </div>
+
 
       {/* 検索ボタン */}
       <div className='mb-8'>

@@ -231,18 +231,37 @@ function calculateFreeSlots(
       
       // 全員が空いているかチェック
       let isSlotFree = true
-      let conflictDetails = []
+      const conflictDetails = []
       
       for (const { email, busy } of busyTimes) {
         for (const { start: busyStart, end: busyEnd } of busy) {
           const busyStartTime = new Date(busyStart)
           const busyEndTime = new Date(busyEnd)
           
+          // 修正: 同じ日付で比較するために時刻のみで比較
+          const slotStartTime = slotStart.getTime()
+          const slotEndTime = slotEnd.getTime()
+          const busyStartTimeStamp = busyStartTime.getTime()
+          const busyEndTimeStamp = busyEndTime.getTime()
+          
+          // 重複チェックの条件: 
+          // スロットの開始 < 予定の終了 AND スロットの終了 > 予定の開始
           const hasConflict = (
-            (slotStart < busyEndTime && slotEnd > busyStartTime)
+            slotStartTime < busyEndTimeStamp && slotEndTime > busyStartTimeStamp
           )
           
-          if (hasConflict) {
+          // 特別ケース: 重複や接触のチェック
+          // 隙間時間が0分の場合は、境界値での接触は許可する
+          // 隙間時間がある場合は、境界値での接触も競合とみなす
+          const isTouching = (
+            slotEndTime === busyStartTimeStamp || slotStartTime === busyEndTimeStamp
+          )
+          
+          // 隙間時間が0の場合は境界での接触を許可、隙間時間がある場合は禁止
+          const shouldAvoidTouching = bufferTimeBefore > 0 || bufferTimeAfter > 0
+          const finalHasConflict = hasConflict || (shouldAvoidTouching && isTouching)
+          
+          if (finalHasConflict) {
             isSlotFree = false
             conflictDetails.push({
               email,
@@ -256,10 +275,17 @@ function calculateFreeSlots(
       }
       
       if (isSlotFree) {
-        const meetingStart = new Date(slotStart.getTime() + bufferTimeBefore * 60 * 1000);
+        // 修正: 会議時間はslotStartから開始し、隙間時間は内部的に確保される
+        const meetingStart = new Date(slotStart);
         const meetingEnd = new Date(meetingStart.getTime() + meetingDuration * 60 * 1000);
+        
+        // 実際に確保される全体の時間枠（デバッグ用）
+        const actualSlotEnd = new Date(slotStart.getTime() + totalSlotMinutes * 60 * 1000);
 
-        console.log(`    ✅ FREE slot (${meetingDuration}min meeting + ${bufferTimeBefore}min before + ${bufferTimeAfter}min after)`)
+        console.log(`    ✅ FREE slot:`)
+        console.log(`       Meeting time: ${meetingStart.toLocaleTimeString()}-${meetingEnd.toLocaleTimeString()} (${meetingDuration}min)`)
+        console.log(`       Buffer before: ${bufferTimeBefore}min, after: ${bufferTimeAfter}min`)
+        console.log(`       Total reserved: ${slotStart.toLocaleTimeString()}-${actualSlotEnd.toLocaleTimeString()} (${totalSlotMinutes}min)`)
         
         daySlots.push({
           start: meetingStart.toISOString(),
@@ -267,7 +293,13 @@ function calculateFreeSlots(
           time: `${meetingStart.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${meetingEnd.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`,
           duration: meetingDuration,
           bufferBefore: bufferTimeBefore,
-          bufferAfter: bufferTimeAfter
+          bufferAfter: bufferTimeAfter,
+          // デバッグ用: 実際に確保される時間枠
+          debug: {
+            slotStart: slotStart.toISOString(),
+            slotEnd: actualSlotEnd.toISOString(),
+            totalDuration: totalSlotMinutes
+          }
         })
       } else {
         console.log(`    ❌ BUSY slot - conflicts:`, conflictDetails.length)
@@ -287,11 +319,16 @@ function calculateFreeSlots(
       slots.push({
         date: dateStr,
         times: daySlots.map(slot => slot.time),
-        metadata: {
-          workingHours: `${workingHours.start}:00-${workingHours.end}:00`,
-          meetingDuration: `${meetingDuration}分`,
-          bufferTimeBefore: `${bufferTimeBefore}分`,
-          bufferTimeAfter: `${bufferTimeAfter}分`
+        debug: {
+          slotDetails: daySlots.map(slot => ({
+            time: slot.time,
+            duration: slot.duration,
+            bufferBefore: slot.bufferBefore,
+            bufferAfter: slot.bufferAfter,
+            slotStart: slot.debug.slotStart,
+            slotEnd: slot.debug.slotEnd,
+            totalDuration: slot.debug.totalDuration
+          }))
         }
       })
     } else {

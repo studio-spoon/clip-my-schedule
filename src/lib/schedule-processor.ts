@@ -76,13 +76,24 @@ export function processScheduleParams(params: ScheduleParams): ProcessedSchedule
   
   if (params.selectedTimeSlot === '時間指定' && params.customTimeStart && params.customTimeEnd) {
     try {
-      workStart = parseInt(params.customTimeStart.split(':')[0])
-      workEnd = parseInt(params.customTimeEnd.split(':')[0])
+      // 時間と分を含めた処理
+      const [startHour, startMin] = params.customTimeStart.split(':').map(Number)
+      const [endHour, endMin] = params.customTimeEnd.split(':').map(Number)
       
-      if (workStart < 0 || workStart > 23 || workEnd < 0 || workEnd > 23 || workStart >= workEnd) {
+      // 分単位で変換して比較
+      const startMinutes = startHour * 60 + startMin
+      const endMinutes = endHour * 60 + endMin
+      
+      if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23 || 
+          startMin < 0 || startMin > 59 || endMin < 0 || endMin > 59 ||
+          startMinutes >= endMinutes) {
         console.warn(`⚠️ Invalid working hours: ${params.customTimeStart}-${params.customTimeEnd}, using defaults`)
         workStart = 10
         workEnd = 17
+      } else {
+        // 時間部分のみを使用（既存の仕様に合わせる）
+        workStart = startHour
+        workEnd = endHour
       }
     } catch (error) {
       console.warn(`⚠️ Failed to parse working hours: ${params.customTimeStart}-${params.customTimeEnd}`)
@@ -185,15 +196,21 @@ export function validateScheduleParams(params: ScheduleParams): {
       errors.push('カスタム時間が指定されていません')
     } else {
       try {
-        const start = parseInt(params.customTimeStart.split(':')[0])
-        const end = parseInt(params.customTimeEnd.split(':')[0])
+        // 時間と分を含めた正確な比較
+        const [startHour, startMin] = params.customTimeStart.split(':').map(Number)
+        const [endHour, endMin] = params.customTimeEnd.split(':').map(Number)
         
-        if (start >= end) {
+        // 分単位で変換して比較
+        const startMinutes = startHour * 60 + startMin
+        const endMinutes = endHour * 60 + endMin
+        
+        if (startMinutes >= endMinutes) {
           errors.push('開始時間は終了時間より前である必要があります')
         }
         
-        if (end - start < 1) {
-          warnings.push('作業時間が短すぎる可能性があります')
+        // 最低15分の作業時間を推奨
+        if (endMinutes - startMinutes < 15) {
+          warnings.push('作業時間が短すぎる可能性があります（最低15分を推奨）')
         }
       } catch (error) {
         errors.push('時間形式が無効です')
