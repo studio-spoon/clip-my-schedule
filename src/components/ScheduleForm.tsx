@@ -2,6 +2,7 @@
 
 import { Clock, Settings } from 'lucide-react';
 import { useRef } from 'react';
+import { UserSettings } from '@/types/settings';
 
 interface ScheduleFormProps {
   selectedPeriod: string;
@@ -26,7 +27,8 @@ interface ScheduleFormProps {
   onCustomDurationChange: (duration: string) => void;
   onCustomPeriodStartChange: (date: string) => void;
   onCustomPeriodEndChange: (date: string) => void;
-  onSearch: () => void;
+  onSearch: (forceRefresh?: boolean) => void;
+  userSettings?: UserSettings;
 }
 
 export default function ScheduleForm({
@@ -53,9 +55,40 @@ export default function ScheduleForm({
   onCustomPeriodStartChange,
   onCustomPeriodEndChange,
   onSearch,
+  userSettings,
 }: ScheduleFormProps) {
   // カスタム所要時間input要素への参照
   const customDurationInputRef = useRef<HTMLInputElement>(null);
+
+  // デフォルト時間のラベルを生成
+  const getDefaultTimeLabel = () => {
+    if (userSettings) {
+      // マイページで設定された時間帯に基づいてラベルを生成
+      switch (userSettings.defaultTimeSlot) {
+        case 'デフォルト':
+          return '09:00-18:00';
+        case '午前':
+          return '09:00-12:00';
+        case '午後':
+          return '13:00-17:00';
+        case '夜間':
+          return '18:00-22:00';
+        case 'カスタム':
+          return `${userSettings.customTimeStart}-${userSettings.customTimeEnd}`;
+        default:
+          return `${userSettings.customTimeStart}-${userSettings.customTimeEnd}`;
+      }
+    }
+    return '09:00-18:00';
+  };
+
+  // デフォルト会議時間のラベルを生成
+  const getDefaultMeetingDurationLabel = () => {
+    if (userSettings) {
+      return userSettings.defaultMeetingDuration || '60分';
+    }
+    return '60分';
+  };
 
   return (
     <>
@@ -139,21 +172,39 @@ export default function ScheduleForm({
 
         <div className='flex flex-wrap gap-3 mb-4'>
           <button
-            onClick={() => onTimeSlotChange('デフォルト')}
+            onClick={() => {
+              // ユーザーのデフォルト時間帯設定を反映
+              const timeSlot = userSettings?.defaultTimeSlot || 'デフォルト';
+              onTimeSlotChange(timeSlot);
+              // デフォルト時間を適用するためのトリガー
+              if (userSettings) {
+                const { timeStart, timeEnd } = (() => {
+                  switch (userSettings.defaultTimeSlot) {
+                    case 'デフォルト': return { timeStart: '09:00', timeEnd: '18:00' };
+                    case '午前': return { timeStart: '09:00', timeEnd: '12:00' };
+                    case '午後': return { timeStart: '13:00', timeEnd: '17:00' };
+                    case '夜間': return { timeStart: '18:00', timeEnd: '22:00' };
+                    case 'カスタム': return { timeStart: userSettings.customTimeStart || '09:00', timeEnd: userSettings.customTimeEnd || '18:00' };
+                    default: return { timeStart: '09:00', timeEnd: '18:00' };
+                  }
+                })();
+                onCustomTimeStartChange(timeStart);
+                onCustomTimeEndChange(timeEnd);
+              }
+            }}
             className={`px-6 py-4 rounded-xl font-medium transition-all duration-200 ${
-              selectedTimeSlot === 'デフォルト'
+              selectedTimeSlot === (userSettings?.defaultTimeSlot || 'デフォルト')
                 ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
             }`}
           >
             <div className='text-center'>
               <div>デフォルト</div>
-              <div className='text-sm opacity-90'>10:00-17:00</div>
+              <div className='text-sm opacity-90'>{getDefaultTimeLabel()}</div>
             </div>
           </button>
           <button
             onClick={() => {
-              console.log('🔘 時間指定ボタンがクリックされました');
               onTimeSlotChange('時間指定');
             }}
             className={`px-6 py-4 rounded-xl font-medium transition-all duration-200 ${
@@ -196,7 +247,22 @@ export default function ScheduleForm({
           </h3>
         </div>
         <div className='flex flex-wrap gap-3 items-center'>
-          {['15分', '30分', '45分', '60分'].map((duration) => (
+          {/* デフォルト会議時間ボタン */}
+          <button
+            onClick={() => onMeetingDurationChange(getDefaultMeetingDurationLabel())}
+            className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+              meetingDuration === getDefaultMeetingDurationLabel()
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transform scale-105'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
+            }`}
+          >
+            <div className='text-center'>
+              <div>デフォルト</div>
+              <div className='text-xs opacity-90'>({getDefaultMeetingDurationLabel()})</div>
+            </div>
+          </button>
+          {/* 固定の時間選択肢 */}
+          {['15分', '30分', '45分', '60分'].filter(duration => duration !== getDefaultMeetingDurationLabel()).map((duration) => (
             <button
               key={duration}
               onClick={() => onMeetingDurationChange(duration)}
@@ -276,22 +342,25 @@ export default function ScheduleForm({
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <label className='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block'>
-              前に空ける
+              前の余白時間
             </label>
             <div className='flex flex-wrap gap-3'>
-              {['0分', '15分', '30分'].map((buffer) => (
-                <button
-                  key={`before-${buffer}`}
-                  onClick={() => onBufferTimeBeforeChange(buffer)}
-                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${
-                    bufferTimeBefore === buffer
-                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg transform scale-105'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
-                  }`}
-                >
-                  {buffer}
-                </button>
-              ))}
+              {['0分', '10分', '20分', '30分'].map((buffer) => {
+                const isActive = bufferTimeBefore === buffer;
+                return (
+                  <button
+                    key={`before-${buffer}`}
+                    onClick={() => onBufferTimeBeforeChange(buffer)}
+                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${
+                      isActive
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg transform scale-105'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
+                    }`}
+                  >
+                    {buffer}
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
@@ -299,7 +368,7 @@ export default function ScheduleForm({
               後に空ける
             </label>
             <div className='flex flex-wrap gap-3'>
-              {['0分', '15分', '30分'].map((buffer) => (
+              {['0分', '10分', '20分', '30分'].map((buffer) => (
                 <button
                   key={`after-${buffer}`}
                   onClick={() => onBufferTimeAfterChange(buffer)}
@@ -319,32 +388,52 @@ export default function ScheduleForm({
 
       {/* 検索ボタン */}
       <div className='mb-8'>
-        <button
-          onClick={onSearch}
-          disabled={isSearching}
-          className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-3 ${
-            isSearching
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl'
-          }`}
-        >
-          {isSearching ? (
-            <>
-              <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
-              検索中...
-            </>
-          ) : (
-            <>
-              <Clock className='w-5 h-5' />
-              {hasSearched ? '結果を更新' : '空き時間を検索'}
-            </>
+        <div className='flex gap-3'>
+          <button
+            onClick={() => onSearch(false)}
+            disabled={isSearching}
+            className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-3 ${
+              isSearching
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl'
+            }`}
+          >
+            {isSearching ? (
+              <>
+                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
+                検索中...
+              </>
+            ) : (
+              <>
+                <Clock className='w-5 h-5' />
+                {hasSearched ? '結果を更新' : '空き時間を検索'}
+              </>
+            )}
+          </button>
+          
+          {hasSearched && (
+            <button
+              onClick={() => {
+                onSearch(true);
+              }}
+              disabled={isSearching}
+              className={`py-4 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 ${
+                isSearching
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-600 to-teal-600 text-white hover:from-green-700 hover:to-teal-700 transform hover:scale-105 hover:shadow-xl'
+              }`}
+              title='Googleカレンダーから最新情報を取得して再検索'
+            >
+              🔄
+            </button>
           )}
-        </button>
+        </div>
 
         {hasSearched && !isSearching && (
-          <p className='text-sm text-gray-500 dark:text-gray-400 text-center mt-2'>
-            💡 設定を変更すると自動的に結果が更新されます
-          </p>
+          <div className='text-sm text-gray-500 dark:text-gray-400 text-center mt-2 space-y-1'>
+            <p>💡 設定を変更すると自動的に結果が更新されます</p>
+            <p>🔄 右のボタンでGoogleカレンダーの最新情報を強制取得</p>
+          </div>
         )}
       </div>
     </>

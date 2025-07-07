@@ -51,11 +51,11 @@ export interface UserSettings {
 // デフォルト設定
 export const DEFAULT_USER_SETTINGS: UserSettings = {
   defaultTimeSlot: 'デフォルト',
-  customTimeStart: '10:00',
+  customTimeStart: '09:00',
   customTimeEnd: '18:00',
   defaultMeetingDuration: '60分',
-  defaultBufferBefore: '0分',
-  defaultBufferAfter: '0分',
+  defaultBufferBefore: '10分',
+  defaultBufferAfter: '10分',
   theme: 'system',
   favoriteMembers: [],
   searchHistory: [],

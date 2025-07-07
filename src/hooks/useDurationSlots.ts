@@ -74,9 +74,6 @@ export function useDurationSlots({
           timeMax.setDate(timeMax.getDate() + 14);
         } else if (selectedPeriod === '期間を指定') {
           if (!customPeriodStart || !customPeriodEnd) {
-            console.log(
-              '期間指定が選択されていますが、開始日または終了日が未入力です。'
-            );
             setDurationSlots([]);
             setIsLoading(false);
             return;
@@ -113,20 +110,6 @@ export function useDurationSlots({
           })
           .filter((email) => email);
 
-        console.log('🔍 Fetching duration slots:');
-        console.log('   Selected period:', selectedPeriod);
-        console.log(
-          '   Time range:',
-          timeMin.toISOString(),
-          'to',
-          timeMax.toISOString()
-        );
-        console.log('   Selected time slot:', selectedTimeSlot);
-        console.log('   Working hours:', workingTimeStart, '-', workingTimeEnd);
-        console.log('   Meeting duration:', meetingDuration);
-        console.log('   Custom duration:', customDuration);
-        console.log('   Members:', selectedMembers);
-        console.log('   Email addresses:', emails);
 
         // Calendar APIを呼び出し（期間・時間帯・所要時間を反映、前後余白は0分）
         const result = await api.calendar.searchAvailableSlots(
@@ -157,7 +140,6 @@ export function useDurationSlots({
             debug: daySlot.debug,
           }));
 
-          console.log('✅ Duration slots fetched:', slots);
           setDurationSlots(slots);
         } else {
           throw new Error(result.error || 'カレンダー情報の取得に失敗しました');

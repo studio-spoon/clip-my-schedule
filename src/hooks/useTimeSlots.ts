@@ -70,7 +70,6 @@ export function useTimeSlots({
           timeMax.setDate(timeMax.getDate() + 14)
         } else if (selectedPeriod === '期間を指定') {
           if (!customPeriodStart || !customPeriodEnd) {
-            console.log('期間指定が選択されていますが、開始日または終了日が未入力です。')
             setTimeSlots([])
             setIsLoading(false)
             return
@@ -103,13 +102,6 @@ export function useTimeSlots({
           return member ? member.calendarId : ''
         }).filter(email => email)
 
-        console.log('🔍 Fetching time slots:')
-        console.log('   Selected period:', selectedPeriod)
-        console.log('   Time range:', timeMin.toISOString(), 'to', timeMax.toISOString())
-        console.log('   Selected time slot:', selectedTimeSlot)
-        console.log('   Working hours:', workingTimeStart, '-', workingTimeEnd)
-        console.log('   Members:', selectedMembers)
-        console.log('   Email addresses:', emails)
 
         // Calendar APIを呼び出し（期間と時間帯を反映）
         const result = await api.calendar.searchAvailableSlots({
@@ -137,7 +129,6 @@ export function useTimeSlots({
             debug: daySlot.debug
           }))
           
-          console.log('✅ Time slots fetched:', slots)
           setTimeSlots(slots)
         } else {
           throw new Error(result.error || 'カレンダー情報の取得に失敗しました')

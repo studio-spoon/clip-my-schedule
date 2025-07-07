@@ -31,7 +31,6 @@ export interface ProcessedScheduleParams {
 export function processScheduleParams(
   params: ScheduleParams
 ): ProcessedScheduleParams {
-  console.log(`📋 Processing schedule parameters:`, params);
 
   // 1. Process time period
   const now = new Date();
@@ -40,89 +39,135 @@ export function processScheduleParams(
 
   switch (params.selectedPeriod) {
     case '直近1週間':
+      // 当日の00:00から1週間後まで
+      startDate.setHours(0, 0, 0, 0);
       endDate.setDate(endDate.getDate() + 7);
       break;
     case '直近2週間':
+      // 当日の00:00から2週間後まで
+      startDate.setHours(0, 0, 0, 0);
       endDate.setDate(endDate.getDate() + 14);
       break;
     case '期間を指定':
       if (params.customPeriodStart && params.customPeriodEnd) {
         try {
           startDate = new Date(params.customPeriodStart);
+          startDate.setHours(0, 0, 0, 0); // 開始日の00:00から
           endDate = new Date(params.customPeriodEnd);
-          // Ensure the time is set to the end of the day
-          endDate.setHours(23, 59, 59, 999);
+          endDate.setHours(23, 59, 59, 999); // 終了日の23:59まで
 
           if (startDate > endDate) {
-            console.warn(
-              `⚠️ Invalid custom period: start date is after end date. Using default.`
-            );
             startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
             endDate = new Date();
             endDate.setDate(endDate.getDate() + 14);
           }
         } catch (error) {
-          console.warn(`⚠️ Failed to parse custom period. Using default.`);
+          startDate.setHours(0, 0, 0, 0);
           endDate.setDate(endDate.getDate() + 14);
         }
       } else {
         // Fallback if custom dates are not provided
+        startDate.setHours(0, 0, 0, 0);
         endDate.setDate(endDate.getDate() + 14);
       }
       break;
     default:
+      startDate.setHours(0, 0, 0, 0);
       endDate.setDate(endDate.getDate() + 14);
   }
 
-  // 2. Process working hours
-  let workStart = 10; // Default 10:00
-  let workEnd = 17; // Default 17:00
-
-  if (
-    params.selectedTimeSlot === '時間指定' &&
-    params.customTimeStart &&
-    params.customTimeEnd
-  ) {
-    try {
-      // 時間と分を含めた処理
-      const [startHour, startMin] = params.customTimeStart
-        .split(':')
-        .map(Number);
-      const [endHour, endMin] = params.customTimeEnd.split(':').map(Number);
-
-      // 分単位で変換して比較
-      const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
-
-      if (
-        startHour < 0 ||
-        startHour > 23 ||
-        endHour < 0 ||
-        endHour > 23 ||
-        startMin < 0 ||
-        startMin > 59 ||
-        endMin < 0 ||
-        endMin > 59 ||
-        startMinutes >= endMinutes
-      ) {
-        console.warn(
-          `⚠️ Invalid working hours: ${params.customTimeStart}-${params.customTimeEnd}, using defaults`
-        );
-        workStart = 10;
-        workEnd = 17;
-      } else {
-        // 時間部分のみを使用（既存の仕様に合わせる）
-        workStart = startHour;
-        workEnd = endHour;
-      }
-    } catch (error) {
-      console.warn(
-        `⚠️ Failed to parse working hours: ${params.customTimeStart}-${params.customTimeEnd}`
-      );
-      workStart = 10;
-      workEnd = 17;
-    }
+  // 🐛 DEBUG: 時間範囲処理の確認
+  console.log('🔧 DEBUG: Schedule processor time range');
+  console.log('   Current time:', now.toLocaleString('ja-JP'));
+  console.log('   Selected period:', params.selectedPeriod);
+  console.log('   Processed start:', startDate.toLocaleString('ja-JP'), '(ISO:', startDate.toISOString(), ')');
+  console.log('   Processed end:', endDate.toLocaleString('ja-JP'), '(ISO:', endDate.toISOString(), ')');
+  
+  // 当日の00:00から開始されているかチェック
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+  if (startDate.getTime() === todayMidnight.getTime()) {
+    console.log('✅ Start time correctly set to today midnight');
+  } else if (startDate.getTime() <= todayMidnight.getTime()) {
+    console.log('✅ Start time is before or at today midnight (custom period)');
+  } else {
+    console.log('⚠️ Start time is after today midnight - may miss past events');
   }
+
+  // 2. Process working hours
+  let workStart = 9; // Default 9:00
+  let workEnd = 18; // Default 18:00
+
+  // 🐛 DEBUG: 時間帯設定の確認
+  console.log('🔧 DEBUG: Schedule processor working hours');
+  console.log('   Selected time slot:', params.selectedTimeSlot);
+  console.log('   Custom time start:', params.customTimeStart);
+  console.log('   Custom time end:', params.customTimeEnd);
+
+  switch (params.selectedTimeSlot) {
+    case '午前':
+      workStart = 9;
+      workEnd = 12;
+      break;
+    case '午後':
+      workStart = 13;
+      workEnd = 17;
+      break;
+    case '夜間':
+      workStart = 18;
+      workEnd = 22;
+      break;
+    case '時間指定':
+      if (params.customTimeStart && params.customTimeEnd) {
+        try {
+          // 時間と分を含めた処理
+          const [startHour, startMin] = params.customTimeStart
+            .split(':')
+            .map(Number);
+          const [endHour, endMin] = params.customTimeEnd.split(':').map(Number);
+
+          // 分単位で変換して比較
+          const startMinutes = startHour * 60 + startMin;
+          const endMinutes = endHour * 60 + endMin;
+
+          if (
+            startHour < 0 ||
+            startHour > 23 ||
+            endHour < 0 ||
+            endHour > 23 ||
+            startMin < 0 ||
+            startMin > 59 ||
+            endMin < 0 ||
+            endMin > 59 ||
+            startMinutes >= endMinutes
+          ) {
+            workStart = 10;
+            workEnd = 17;
+          } else {
+            // 時間部分のみを使用（既存の仕様に合わせる）
+            workStart = startHour;
+            workEnd = endHour;
+          }
+        } catch (error) {
+          workStart = 10;
+          workEnd = 17;
+        }
+      } else {
+        // Fallback for '時間指定' if custom times are not provided
+        workStart = 9;
+        workEnd = 18;
+      }
+      break;
+    case 'デフォルト': // Fallthrough to default if 'デフォルト' is explicitly selected
+    default:
+      workStart = 9;
+      workEnd = 18;
+      break;
+  }
+
+  // 🐛 DEBUG: 処理後のワーキングアワー
+  console.log('   Final working hours:', `${workStart}:00-${workEnd}:00`);
 
   // 3. Process meeting duration
   let meetingDuration = 60; // Default 60 minutes
@@ -131,17 +176,11 @@ export function processScheduleParams(
     try {
       meetingDuration = parseInt(params.meetingDuration.replace('分', ''));
     } catch (error) {
-      console.warn(
-        `⚠️ Failed to parse meeting duration: ${params.meetingDuration}`
-      );
     }
   } else if (params.customDuration) {
     try {
       meetingDuration = parseInt(params.customDuration);
     } catch (error) {
-      console.warn(
-        `⚠️ Failed to parse custom duration: ${params.customDuration}`
-      );
     }
   }
 
@@ -153,18 +192,12 @@ export function processScheduleParams(
     try {
       bufferTimeBefore = parseInt(params.bufferTimeBefore.replace('分', ''));
     } catch (error) {
-      console.warn(
-        `⚠️ Failed to parse buffer time before: ${params.bufferTimeBefore}`
-      );
     }
   }
   if (params.bufferTimeAfter) {
     try {
       bufferTimeAfter = parseInt(params.bufferTimeAfter.replace('分', ''));
     } catch (error) {
-      console.warn(
-        `⚠️ Failed to parse buffer time after: ${params.bufferTimeAfter}`
-      );
     }
   }
 
@@ -183,14 +216,6 @@ export function processScheduleParams(
     totalSlotDuration: bufferTimeBefore + meetingDuration + bufferTimeAfter,
   };
 
-  console.log(`✅ Processed parameters:`, {
-    period: `${startDate.toDateString()} to ${endDate.toDateString()}`,
-    workingHours: `${workStart}:00-${workEnd}:00`,
-    meetingDuration: `${meetingDuration} minutes`,
-    bufferTimeBefore: `${bufferTimeBefore} minutes`,
-    bufferTimeAfter: `${bufferTimeAfter} minutes`,
-    totalSlotDuration: `${processed.totalSlotDuration} minutes`,
-  });
 
   return processed;
 }

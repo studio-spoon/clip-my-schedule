@@ -2,7 +2,6 @@
 import type { 
   ApiResponse, 
   Member, 
-  CalendarSlot, 
   CalendarSearchParams,
   ScheduleSearchResult,
   MembersResult
@@ -34,7 +33,6 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<ApiRes
 
     return data
   } catch (error) {
-    console.error('API request failed:', error)
     
     if (error instanceof ApiError) {
       return {
@@ -86,10 +84,8 @@ export const calendarApi = {
     })
     
     // スケジュールパラメータを追加
-    console.log('📤 API Service - Schedule params received:', scheduleParams)
     if (scheduleParams) {
       Object.entries(scheduleParams).forEach(([key, value]) => {
-        console.log(`   ${key}: "${value}" (${typeof value})`)
         if (value) {
           searchParams.append(key, value)
         }
@@ -97,7 +93,6 @@ export const calendarApi = {
     }
     
     const finalUrl = `/api/calendar?${searchParams}`
-    console.log('📤 API Service - Final URL:', finalUrl)
     
     return apiRequest<ScheduleSearchResult>(finalUrl)
   }

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useUserSettings } from '@/hooks/useUserSettings'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -15,12 +16,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('system')
   const [isDark, setIsDark] = useState(false)
+  const { settings, updateSetting } = useUserSettings()
 
-  // テーマ設定の初期化
+  // ユーザー設定からテーマを初期化
   useEffect(() => {
-    const savedTheme = (localStorage.getItem('theme') as Theme) || 'system'
-    setTheme(savedTheme)
-  }, [])
+    if (settings.theme) {
+      setTheme(settings.theme as Theme)
+    }
+  }, [settings.theme])
 
   // テーマに基づいてisDarkを更新
   useEffect(() => {
@@ -55,7 +58,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
+    // ユーザー設定に保存
+    updateSetting('theme', newTheme)
   }
 
   return (

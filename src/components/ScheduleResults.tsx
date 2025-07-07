@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { mergeDaySlots, formatMergedTimeSlot } from '@/utils/timeSlotMerger'
+import { UserSettings } from '@/types/settings'
 
 interface ScheduleSlot {
   date: string
@@ -30,6 +31,7 @@ interface ScheduleResultsProps {
   meetingDuration: string
   bufferTimeBefore: string
   bufferTimeAfter: string
+  userSettings?: UserSettings
 }
 
 export default function ScheduleResults({
@@ -41,28 +43,42 @@ export default function ScheduleResults({
   customTimeEnd,
   meetingDuration,
   bufferTimeBefore,
-  bufferTimeAfter
+  bufferTimeAfter,
+  userSettings
 }: ScheduleResultsProps) {
   const [isCopied, setIsCopied] = useState(false)
-  const [showDebug, setShowDebug] = useState(true) // デバッグ情報を表示
   
   // 安全なデフォルト値
   const safeAvailableSlots = availableSlots || []
 
   const generateTextOutput = () => {
-    const memberList = selectedMembers.join(', ')
-    const timeRange =
-      selectedTimeSlot === 'デフォルト'
-        ? '10:00-17:00'
-        : `${customTimeStart}-${customTimeEnd}`
+    // selectedMembersが空の場合の安全な処理
+    const memberList = selectedMembers.length > 0 ? selectedMembers.join(', ') : '（参加者が選択されていません）'
+    
+    // デフォルト時間帯の正確な表示
+    const getTimeRange = () => {
+      if (selectedTimeSlot === 'デフォルト' && userSettings) {
+        switch (userSettings.defaultTimeSlot) {
+          case 'デフォルト': return '09:00-18:00'
+          case '午前': return '09:00-12:00'
+          case '午後': return '13:00-17:00'
+          case '夜間': return '18:00-22:00'
+          case 'カスタム': return `${userSettings.customTimeStart}-${userSettings.customTimeEnd}`
+          default: return `${userSettings.customTimeStart}-${userSettings.customTimeEnd}`
+        }
+      }
+      return `${customTimeStart}-${customTimeEnd}`
+    }
+    
+    const timeRange = getTimeRange()
 
     let output = `【スケジュール調整】\n\n`
     output += `対象メンバー: ${memberList}\n`
     output += `期間: ${selectedPeriod}\n`
     output += `時間帯: ${timeRange}\n`
     output += `所要時間: ${meetingDuration}\n`
-    output += `前に空ける時間: ${bufferTimeBefore}\n`
-    output += `後に空ける時間: ${bufferTimeAfter}\n\n`
+    output += `前の余白時間: ${bufferTimeBefore}\n`
+    output += `後の余白時間: ${bufferTimeAfter}\n\n`
     output += `【空き時間】\n`
 
     mergeDaySlots(safeAvailableSlots).forEach((slot) => {
@@ -82,7 +98,6 @@ export default function ScheduleResults({
       setIsCopied(true)
       setTimeout(() => setIsCopied(false), 2000)
     } catch (err) {
-      console.error('クリップボードへのコピーに失敗しました:', err)
     }
   }
 
@@ -98,54 +113,27 @@ export default function ScheduleResults({
 
       {/* 空き時間リスト */}
       <div className='bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl p-6 mb-6 border border-gray-200 dark:border-gray-600'>
-        <div className='flex items-center justify-between mb-4'>
+        <div className='mb-4'>
           <h4 className='text-lg font-semibold text-gray-800 dark:text-white'>
             空き時間一覧
           </h4>
-          <button
-            onClick={() => setShowDebug(!showDebug)}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
-              showDebug
-                ? 'bg-yellow-500 text-white shadow-md'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500'
-            }`}
-          >
-            {showDebug ? '🔧 デバッグ表示中' : '🔧 デバッグ表示'}
-          </button>
         </div>
-        <div className='space-y-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
           {mergeDaySlots(safeAvailableSlots).map((slot, index) => (
-            <div
-              key={index}
-              className='bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700'
-            >
-              <div className='font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2'>
+            <div key={index} className='bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700'>
+              <div className='font-medium text-gray-900 dark:text-white text-sm mb-2'>
                 {slot.date}
-                {slot.originalCount > 0 && (
-                  <span className='text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded'>
-                    {slot.originalCount}個の時間枠から統合
-                  </span>
-                )}
               </div>
-              <div className='space-y-2'>
+              <div className='space-y-1'>
                 {slot.mergedTimes.map((time, timeIndex) => (
                   <div
                     key={timeIndex}
-                    className='bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-sm'
+                    className='bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-medium'
                   >
                     {formatMergedTimeSlot(time)}
                   </div>
                 ))}
               </div>
-              {showDebug && (
-                <div className='mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
-                  <div className='text-xs text-gray-600 dark:text-gray-400 font-medium mb-2'>🔧 デバッグ情報:</div>
-                  <div className='text-xs text-gray-600 dark:text-gray-400'>
-                    元の時間枠数: {slot.originalCount}個<br />
-                    統合後: {slot.mergedTimes.length}個の連続した空き時間
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </div>

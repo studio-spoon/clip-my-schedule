@@ -37,8 +37,34 @@ export interface CalendarSearchParams {
   emails: string[]
 }
 
+export interface BusyTime {
+  email: string
+  busy: Array<{
+    start: string
+    end: string
+    summary?: string
+    responseStatus?: string
+  }>
+  error?: string
+  source?: string
+  cachedAt?: string
+}
+
 export interface ScheduleSearchResult {
   freeSlots: CalendarSlot[]
+  availableTimes?: CalendarSlot[]
+  busyTimes?: BusyTime[]
+  timeRange?: {
+    timeMin: string
+    timeMax: string
+  }
+  participants?: string[]
+  filters?: {
+    timeSlot: string
+    meetingDuration: string | number
+    bufferBefore: string | number
+    bufferAfter: string | number
+  }
 }
 
 export interface MembersResult {

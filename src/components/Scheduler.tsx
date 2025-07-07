@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useMembers } from '@/hooks/useMembers';
 import { useScheduleState } from '@/hooks/useScheduleState';
 import { useScheduleSearch } from '@/hooks/useScheduleSearch';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import LoginForm from '@/components/LoginForm';
 import AppHeader from '@/components/AppHeader';
 import MemberSelection from '@/components/MemberSelection';
@@ -21,6 +22,7 @@ function SchedulerContent() {
   const isAuthenticated = status === 'authenticated';
 
   // カスタムフック
+  const { settings, addFavoriteMember, removeFavoriteMember, addSearchHistory } = useUserSettings();
   const {
     teamMembers,
     isLoading: isMembersLoading,
@@ -28,26 +30,39 @@ function SchedulerContent() {
     refetch: refetchMembers,
     addManualMember,
   } = useMembers();
-  const scheduleState = useScheduleState();
+  const scheduleState = useScheduleState(settings);
   const { availableSlots, isSearching, hasSearched, searchSchedule } =
     useScheduleSearch();
 
-  // セッション初期化
+  // セッション初期化とお気に入りメンバー自動選択
   useEffect(() => {
     if (
       session?.user &&
-      teamMembers.length > 0 &&
-      scheduleState.selectedMembers.length === 0
+      teamMembers.length > 0
     ) {
-      // 自分を最初に選択状態にする
+      // 自分を最初に選択状態にする（まだ選択されていない場合のみ）
       const currentUser = teamMembers.find(
         (member) => member.email === session?.user?.email
       );
-      if (currentUser) {
-        scheduleState.setInitialMember(currentUser.displayName);
+      if (currentUser && !scheduleState.selectedMembers.includes(currentUser.displayName)) {
+        scheduleState.handleMemberToggle(currentUser.displayName);
+      }
+
+      // お気に入りメンバーを自動選択
+      if (settings.favoriteMembers && settings.favoriteMembers.length > 0) {
+        const favoriteEmails = settings.favoriteMembers.map(fav => fav.email);
+        const favoriteTeamMembers = teamMembers.filter(member => 
+          favoriteEmails.includes(member.email)
+        );
+        
+        favoriteTeamMembers.forEach(member => {
+          if (!scheduleState.selectedMembers.includes(member.displayName)) {
+            scheduleState.handleMemberToggle(member.displayName);
+          }
+        });
       }
     }
-  }, [session, teamMembers, scheduleState]);
+  }, [session, teamMembers, scheduleState.selectedMembers, scheduleState.handleMemberToggle, settings.favoriteMembers]);
 
   // ログアウト
   const handleLogout = () => {
@@ -55,25 +70,23 @@ function SchedulerContent() {
     signOut();
   };
 
-  const handleSearch = () => {
-    // 🔍 Scheduler component - パラメータをログ出力して確認
-    console.log('🎯 Scheduler.handleSearch called with state:');
-    console.log('   selectedMembers:', scheduleState.selectedMembers);
-    console.log('   selectedPeriod:', scheduleState.selectedPeriod);
-    console.log('   selectedTimeSlot:', scheduleState.selectedTimeSlot);
-    console.log('   customTimeStart:', scheduleState.customTimeStart);
-    console.log('   customTimeEnd:', scheduleState.customTimeEnd);
-    console.log('   meetingDuration:', scheduleState.meetingDuration);
-    console.log('   bufferTimeBefore:', scheduleState.bufferTimeBefore);
-    console.log('   bufferTimeAfter:', scheduleState.bufferTimeAfter);
-    console.log('   customDuration:', scheduleState.customDuration);
-    console.log('   customPeriodStart:', scheduleState.customPeriodStart);
-    console.log('   customPeriodEnd:', scheduleState.customPeriodEnd);
-    console.log('   teamMembers count:', teamMembers.length);
+  const handleSearch = (forceRefresh = false) => {
+
+    // 検索履歴を記録
+    addSearchHistory({
+      participants: scheduleState.selectedMembers,
+      timeSlot: scheduleState.selectedTimeSlot,
+      customTimeStart: scheduleState.customTimeStart,
+      customTimeEnd: scheduleState.customTimeEnd,
+      meetingDuration: scheduleState.meetingDuration,
+      bufferTimeBefore: scheduleState.bufferTimeBefore,
+      bufferTimeAfter: scheduleState.bufferTimeAfter,
+    });
 
     searchSchedule({
       ...scheduleState.scheduleState,
       teamMembers,
+      forceRefresh,
     });
   };
 
@@ -95,13 +108,14 @@ function SchedulerContent() {
       customPeriodEnd: scheduleState.customPeriodEnd,
     };
 
-    // 検索条件が変わったときだけ検索
+    // 検索条件が変わったときだけ検索（自動検索が有効の場合のみ）
     if (
       hasSearched &&
+      settings.autoSearch &&
       JSON.stringify(prevSearchParams.current) !== JSON.stringify(currentParams)
     ) {
       prevSearchParams.current = currentParams;
-      handleSearch();
+      handleSearch(false); // 自動検索時はキャッシュを使用
     }
   }, [
     scheduleState.selectedMembers,
@@ -117,6 +131,7 @@ function SchedulerContent() {
     scheduleState.customPeriodEnd,
     hasSearched,
     handleSearch,
+    settings.autoSearch,
   ]);
 
   const handleAddMember = async (member: Member) => {
@@ -162,6 +177,9 @@ function SchedulerContent() {
                 onRetry={refetchMembers}
                 onAddMember={handleAddMember}
                 userEmail={session?.user?.email || null}
+                favoriteMembers={settings.favoriteMembers}
+                onAddFavorite={addFavoriteMember}
+                onRemoveFavorite={removeFavoriteMember}
               />
 
               <ScheduleForm
@@ -188,6 +206,7 @@ function SchedulerContent() {
                 onCustomPeriodStartChange={scheduleState.setCustomPeriodStart}
                 onCustomPeriodEndChange={scheduleState.setCustomPeriodEnd}
                 onSearch={handleSearch}
+                userSettings={settings}
               />
 
               <ScheduleResults
@@ -200,6 +219,7 @@ function SchedulerContent() {
                 meetingDuration={scheduleState.meetingDuration}
                 bufferTimeAfter={scheduleState.bufferTimeAfter}
                 bufferTimeBefore={scheduleState.bufferTimeBefore}
+                userSettings={settings}
               />
             </div>
           </div>
@@ -209,8 +229,8 @@ function SchedulerContent() {
         </div>
       </div>
 
-      {/* Debug Panel (開発環境のみ) */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* Debug Panel (ユーザー設定に基づいて表示) */}
+      {settings.showDebugInfo && (
         <DebugPanel teamMembers={teamMembers} />
       )}
     </div>

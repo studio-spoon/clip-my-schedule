@@ -40,8 +40,6 @@ export function useAvailableSlots(
           return member ? member.calendarId : ''
         }).filter(email => email)
 
-        console.log('🔍 Fetching available slots for members:', selectedMembers)
-        console.log('🔍 Email addresses:', emails)
 
         // Calendar APIを呼び出し（基本的な空き時間取得）
         const result = await api.calendar.searchAvailableSlots({

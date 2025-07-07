@@ -2,7 +2,6 @@
 
 import { Calendar, LogOut, Sun, Moon, Monitor, Settings } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 
 // ...
@@ -65,7 +64,7 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
         </a>
 
         {/* テーマ切り替え */}
-        <div className='flex items-center gap-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg border border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center gap-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg border border-gray-200 dark:border-gray-700 hidden'>
           <button
             onClick={() => setTheme('light')}
             className={`p-2 rounded-full transition-all duration-200 ${

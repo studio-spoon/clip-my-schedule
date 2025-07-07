@@ -1,8 +1,9 @@
 'use client';
 
-import { Users, Search, X } from 'lucide-react';
+import { Users, Search, X, Star } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { Member } from '@/types/api';
+import type { FavoriteMember } from '@/types/settings';
 import AddMemberForm from '@/components/AddMemberForm';
 import UserAvatar from '@/components/UserAvatar';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
@@ -16,6 +17,9 @@ interface MemberSelectionProps {
   onRetry: () => void;
   onAddMember?: (member: Member) => void;
   userEmail?: string | null;
+  favoriteMembers?: FavoriteMember[];
+  onAddFavorite?: (member: FavoriteMember) => void;
+  onRemoveFavorite?: (email: string) => void;
 }
 
 export default function MemberSelection({
@@ -27,6 +31,9 @@ export default function MemberSelection({
   onRetry,
   onAddMember,
   userEmail,
+  favoriteMembers = [],
+  onAddFavorite,
+  onRemoveFavorite,
 }: MemberSelectionProps) {
   const [addMemberError, setAddMemberError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +43,23 @@ export default function MemberSelection({
   const organizationMembers = teamMembers.filter(
     (m) => m.source === 'organization'
   );
+
+  // お気に入りメンバーの管理
+  const isFavorite = (email: string) => {
+    return favoriteMembers.some(fav => fav.email === email);
+  };
+
+  const handleToggleFavorite = (member: Member) => {
+    if (isFavorite(member.email)) {
+      onRemoveFavorite?.(member.email);
+    } else {
+      onAddFavorite?.({
+        email: member.email,
+        name: member.name,
+        addedAt: new Date().toISOString(),
+      });
+    }
+  };
 
   // 選択されたメンバーの空き時間を取得
   const {} = useAvailableSlots(selectedMembers, teamMembers);
@@ -177,6 +201,17 @@ export default function MemberSelection({
                   }`}>
                     {member.source === 'organization' ? '組織' : '共有'}
                   </span>
+                  <button
+                    onClick={() => handleToggleFavorite(member)}
+                    className={`${
+                      isFavorite(member.email)
+                        ? 'text-yellow-500 hover:text-yellow-600'
+                        : 'text-gray-400 hover:text-yellow-500'
+                    } transition-colors`}
+                    title={isFavorite(member.email) ? 'お気に入りから削除' : 'お気に入りに追加'}
+                  >
+                    {isFavorite(member.email) ? <Star className='w-3 h-3 fill-current' /> : <Star className='w-3 h-3' />}
+                  </button>
                   <button
                     onClick={() => handleRemoveMember(member.displayName)}
                     className='text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400'

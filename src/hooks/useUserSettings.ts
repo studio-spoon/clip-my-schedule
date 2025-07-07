@@ -34,7 +34,6 @@ export function useUserSettings() {
         if (validateUserSettings(parsed)) {
           setSettings(parsed);
         } else {
-          console.warn('Invalid user settings found, using defaults');
           setSettings(DEFAULT_USER_SETTINGS);
         }
       } else {
@@ -43,7 +42,6 @@ export function useUserSettings() {
         localStorage.setItem(storageKey, JSON.stringify(DEFAULT_USER_SETTINGS));
       }
     } catch (err) {
-      console.error('Failed to load user settings:', err);
       setError('設定の読み込みに失敗しました');
       setSettings(DEFAULT_USER_SETTINGS);
     } finally {
@@ -202,6 +200,19 @@ export function useUserSettings() {
       loadSettings();
     }
   }, [session, loadSettings]);
+
+  // storage変更を監視して他のタブでの設定変更を検知
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      const storageKey = getStorageKey();
+      if (storageKey && e.key === storageKey) {
+        loadSettings();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [loadSettings, getStorageKey]);
 
   return {
     settings,

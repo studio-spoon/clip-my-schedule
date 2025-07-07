@@ -23,17 +23,14 @@ export function getCachedCalendarData(email: string, timeMin: string, timeMax: s
   const cached = calendarCache.get(key)
   
   if (!cached) {
-    console.log(`📄 Cache MISS for ${email}`)
     return null
   }
   
   if (Date.now() > cached.expiresAt) {
-    console.log(`⏰ Cache EXPIRED for ${email}`)
     calendarCache.delete(key)
     return null
   }
   
-  console.log(`🎯 Cache HIT for ${email} (${cached.busyPeriods.length} busy periods)`)
   return cached
 }
 
@@ -56,7 +53,6 @@ export function setCachedCalendarData(
   }
   
   calendarCache.set(key, cachedData)
-  console.log(`💾 Cached calendar data for ${email} (expires in ${CACHE_DURATION / 1000}s)`)
 }
 
 export function clearCalendarCache(email?: string): void {
@@ -64,13 +60,20 @@ export function clearCalendarCache(email?: string): void {
     // Clear all cache entries for specific email
     const keysToDelete = Array.from(calendarCache.keys()).filter(key => key.startsWith(email + ':'))
     keysToDelete.forEach(key => calendarCache.delete(key))
-    console.log(`🗑️ Cleared ${keysToDelete.length} cache entries for ${email}`)
   } else {
     // Clear all cache
     const size = calendarCache.size
     calendarCache.clear()
-    console.log(`🗑️ Cleared entire calendar cache (${size} entries)`)
   }
+}
+
+export function clearCalendarCacheForEmails(emails: string[]): void {
+  let totalCleared = 0
+  emails.forEach(email => {
+    const keysToDelete = Array.from(calendarCache.keys()).filter(key => key.startsWith(email + ':'))
+    keysToDelete.forEach(key => calendarCache.delete(key))
+    totalCleared += keysToDelete.length
+  })
 }
 
 export function getCacheStats(): {

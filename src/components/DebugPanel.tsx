@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Bug, ChevronDown, ChevronUp } from 'lucide-react'
+import { Bug, ChevronDown } from 'lucide-react'
 import { Member } from '@/types/api'
 
 interface DebugPanelProps {

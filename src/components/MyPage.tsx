@@ -14,7 +14,6 @@ export default function MyPage() {
     isLoading,
     error,
     updateSetting,
-    addFavoriteMember,
     removeFavoriteMember,
     removeSearchHistory,
     clearSearchHistory,
@@ -164,7 +163,7 @@ export default function MyPage() {
                     onChange={(e) => updateSetting('defaultTimeSlot', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="デフォルト">デフォルト (10:00-18:00)</option>
+                    <option value="デフォルト">デフォルト (09:00-18:00)</option>
                     <option value="午前">午前 (09:00-12:00)</option>
                     <option value="午後">午後 (13:00-17:00)</option>
                     <option value="夜間">夜間 (18:00-22:00)</option>
@@ -236,9 +235,8 @@ export default function MyPage() {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0分">なし</option>
-                    <option value="5分">5分</option>
                     <option value="10分">10分</option>
-                    <option value="15分">15分</option>
+                    <option value="20分">20分</option>
                     <option value="30分">30分</option>
                   </select>
                 </div>
@@ -253,9 +251,8 @@ export default function MyPage() {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0分">なし</option>
-                    <option value="5分">5分</option>
                     <option value="10分">10分</option>
-                    <option value="15分">15分</option>
+                    <option value="20分">20分</option>
                     <option value="30分">30分</option>
                   </select>
                 </div>
@@ -281,7 +278,7 @@ export default function MyPage() {
                     ].map(({ value, label, icon: Icon }) => (
                       <button
                         key={value}
-                        onClick={() => updateSetting('theme', value as any)}
+                        onClick={() => updateSetting('theme', value as 'light' | 'dark' | 'system')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
                           settings.theme === value
                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
