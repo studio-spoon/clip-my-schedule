@@ -12,7 +12,7 @@ export default function PrivacyPage() {
             className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4'
           >
             <ArrowLeft className='w-4 h-4' />
-            Time Clipperに戻る
+            アプリに戻る
           </Link>
 
           <div className='flex items-center gap-4 mb-6'>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         </div>
 
         {/* コンテンツ */}
-        <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 prose dark:prose-invert max-w-none'>
+        <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 prose max-w-none'>
           <p className='text-sm text-gray-500 dark:text-gray-400 mb-8'>
             最終更新日: 2025年7月5日
           </p>

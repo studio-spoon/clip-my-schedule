@@ -22,7 +22,12 @@ function SchedulerContent() {
   const isAuthenticated = status === 'authenticated';
 
   // カスタムフック
-  const { settings, addFavoriteMember, removeFavoriteMember, addSearchHistory } = useUserSettings();
+  const {
+    settings,
+    addFavoriteMember,
+    removeFavoriteMember,
+    addSearchHistory,
+  } = useUserSettings();
   const {
     teamMembers,
     isLoading: isMembersLoading,
@@ -36,33 +41,39 @@ function SchedulerContent() {
 
   // セッション初期化とお気に入りメンバー自動選択
   useEffect(() => {
-    if (
-      session?.user &&
-      teamMembers.length > 0
-    ) {
+    if (session?.user && teamMembers.length > 0) {
       // 自分を最初に選択状態にする（まだ選択されていない場合のみ）
       const currentUser = teamMembers.find(
         (member) => member.email === session?.user?.email
       );
-      if (currentUser && !scheduleState.selectedMembers.includes(currentUser.displayName)) {
+      if (
+        currentUser &&
+        !scheduleState.selectedMembers.includes(currentUser.displayName)
+      ) {
         scheduleState.handleMemberToggle(currentUser.displayName);
       }
 
       // お気に入りメンバーを自動選択
       if (settings.favoriteMembers && settings.favoriteMembers.length > 0) {
-        const favoriteEmails = settings.favoriteMembers.map(fav => fav.email);
-        const favoriteTeamMembers = teamMembers.filter(member => 
+        const favoriteEmails = settings.favoriteMembers.map((fav) => fav.email);
+        const favoriteTeamMembers = teamMembers.filter((member) =>
           favoriteEmails.includes(member.email)
         );
-        
-        favoriteTeamMembers.forEach(member => {
+
+        favoriteTeamMembers.forEach((member) => {
           if (!scheduleState.selectedMembers.includes(member.displayName)) {
             scheduleState.handleMemberToggle(member.displayName);
           }
         });
       }
     }
-  }, [session, teamMembers, scheduleState.selectedMembers, scheduleState.handleMemberToggle, settings.favoriteMembers]);
+  }, [
+    session,
+    teamMembers,
+    scheduleState.selectedMembers,
+    scheduleState.handleMemberToggle,
+    settings.favoriteMembers,
+  ]);
 
   // ログアウト
   const handleLogout = () => {
@@ -71,7 +82,6 @@ function SchedulerContent() {
   };
 
   const handleSearch = (forceRefresh = false) => {
-
     // 検索履歴を記録
     addSearchHistory({
       participants: scheduleState.selectedMembers,
@@ -167,7 +177,11 @@ function SchedulerContent() {
             <AppHeader session={session} onLogout={handleLogout} />
 
             {/* メインコンテンツ */}
-            <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 backdrop-blur-sm'>
+            <div
+              className='bg-white dark:bg-gray-800 rounded-2xl 
+  shadow-xl border border-gray-200 dark:border-gray-700 p-4 
+  md:p-8 backdrop-blur-sm'
+            >
               <MemberSelection
                 teamMembers={teamMembers}
                 selectedMembers={scheduleState.selectedMembers}
@@ -230,9 +244,7 @@ function SchedulerContent() {
       </div>
 
       {/* Debug Panel (ユーザー設定に基づいて表示) */}
-      {settings.showDebugInfo && (
-        <DebugPanel teamMembers={teamMembers} />
-      )}
+      {settings.showDebugInfo && <DebugPanel teamMembers={teamMembers} />}
     </div>
   );
 }

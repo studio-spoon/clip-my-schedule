@@ -17,7 +17,7 @@ export default function LoginForm({ isLoading }: LoginFormProps) {
       <div className='min-h-screen flex items-center justify-center p-4'>
         <div className='max-w-md w-full'>
           {/* ログインカード */}
-          <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 backdrop-blur-sm'>
+          <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 md:p-8 backdrop-blur-sm'>
             {/* ロゴとタイトル */}
             <div className='text-center mb-8'>
               <div className='p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg inline-block mb-4'>
@@ -27,7 +27,7 @@ export default function LoginForm({ isLoading }: LoginFormProps) {
                 Time Clipper
               </h1>
               <p className='text-gray-600 dark:text-gray-400'>
-                Googleカレンダーの空き時間候補を簡単リストアップ
+                Googleカレンダーの空き時間を簡単リストアップ
               </p>
             </div>
 

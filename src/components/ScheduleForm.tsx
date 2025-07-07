@@ -105,7 +105,7 @@ export default function ScheduleForm({
             <button
               key={period}
               onClick={() => onPeriodChange(period)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+              className={`px-3 md:px-6 py-3 rounded-xl font-medium transition-all duration-200 text-sm md:text-base ${
                 selectedPeriod === period
                   ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg transform scale-105'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
@@ -223,7 +223,7 @@ export default function ScheduleForm({
               type='time'
               value={customTimeStart}
               onChange={(e) => onCustomTimeStartChange(e.target.value)}
-              className='border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+              className='border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:[color-scheme:dark]'
             />
             <span className='text-gray-500 dark:text-gray-400 font-medium'>
               〜
@@ -232,7 +232,7 @@ export default function ScheduleForm({
               type='time'
               value={customTimeEnd}
               onChange={(e) => onCustomTimeEndChange(e.target.value)}
-              className='border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+              className='border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:[color-scheme:dark]'
             />
           </div>
         )}
@@ -388,51 +388,31 @@ export default function ScheduleForm({
 
       {/* 検索ボタン */}
       <div className='mb-8'>
-        <div className='flex gap-3'>
-          <button
-            onClick={() => onSearch(false)}
-            disabled={isSearching}
-            className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-3 ${
-              isSearching
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl'
-            }`}
-          >
-            {isSearching ? (
-              <>
-                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
-                検索中...
-              </>
-            ) : (
-              <>
-                <Clock className='w-5 h-5' />
-                {hasSearched ? '結果を更新' : '空き時間を検索'}
-              </>
-            )}
-          </button>
-          
-          {hasSearched && (
-            <button
-              onClick={() => {
-                onSearch(true);
-              }}
-              disabled={isSearching}
-              className={`py-4 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 ${
-                isSearching
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-600 to-teal-600 text-white hover:from-green-700 hover:to-teal-700 transform hover:scale-105 hover:shadow-xl'
-              }`}
-              title='Googleカレンダーから最新情報を取得して再検索'
-            >
-              🔄
-            </button>
+        <button
+          onClick={() => onSearch(false)}
+          disabled={isSearching}
+          className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-3 ${
+            isSearching
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl'
+          }`}
+        >
+          {isSearching ? (
+            <>
+              <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
+              検索中...
+            </>
+          ) : (
+            <>
+              <Clock className='w-5 h-5' />
+              {hasSearched ? '結果を更新' : '空き時間を検索'}
+            </>
           )}
-        </div>
+        </button>
 
         {hasSearched && !isSearching && (
-          <div className='text-sm text-gray-500 dark:text-gray-400 text-center mt-2 space-y-1'>
+          <div className='text-sm text-gray-500 dark:text-gray-400 text-center mt-2'>
             <p>💡 設定を変更すると自動的に結果が更新されます</p>
-            <p>🔄 右のボタンでGoogleカレンダーの最新情報を強制取得</p>
           </div>
         )}
       </div>

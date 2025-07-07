@@ -54,7 +54,13 @@ export default function UserAvatar({
         src={photo}
         alt={`${name}のアバター`}
         className={`${sizeClasses[size]} rounded-full object-cover`}
-        onError={() => setImageError(true)}
+        loading="eager"
+        referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
+        onError={() => {
+          console.log(`Avatar image failed to load for ${name}, falling back to initials`);
+          setImageError(true);
+        }}
         title={`${name} (${email})`}
       />
     );
