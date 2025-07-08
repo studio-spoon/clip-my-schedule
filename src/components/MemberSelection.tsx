@@ -7,6 +7,8 @@ import type { FavoriteMember } from '@/types/settings';
 import AddMemberForm from '@/components/AddMemberForm';
 import UserAvatar from '@/components/UserAvatar';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
+// 課金機能は開発中のため一時的にコメントアウト
+// import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 interface MemberSelectionProps {
   teamMembers: Member[];
@@ -38,6 +40,8 @@ export default function MemberSelection({
   const [addMemberError, setAddMemberError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  // 課金機能は開発中のため一時的にコメントアウト
+  // const featureFlags = useFeatureFlags();
 
   const userDomain = userEmail?.split('@')[1] || '';
   const organizationMembers = teamMembers.filter(
@@ -53,6 +57,10 @@ export default function MemberSelection({
     if (isFavorite(member.email)) {
       onRemoveFavorite?.(member.email);
     } else {
+      // 課金機能は開発中のため制限チェックを一時的にコメントアウト
+      // if (!featureFlags.canAddToFavorites) {
+      //   return;
+      // }
       onAddFavorite?.({
         email: member.email,
         name: member.name,

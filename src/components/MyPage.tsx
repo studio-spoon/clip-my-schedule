@@ -161,7 +161,7 @@ export default function MyPage() {
                   <select
                     value={settings.defaultTimeSlot}
                     onChange={(e) => updateSetting('defaultTimeSlot', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="デフォルト">デフォルト (09:00-18:00)</option>
                     <option value="午前">午前 (09:00-12:00)</option>
@@ -214,7 +214,7 @@ export default function MyPage() {
                   <select
                     value={settings.defaultMeetingDuration}
                     onChange={(e) => updateSetting('defaultMeetingDuration', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="15分">15分</option>
                     <option value="30分">30分</option>
@@ -232,7 +232,7 @@ export default function MyPage() {
                   <select
                     value={settings.defaultBufferBefore}
                     onChange={(e) => updateSetting('defaultBufferBefore', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0分">なし</option>
                     <option value="10分">10分</option>
@@ -248,7 +248,7 @@ export default function MyPage() {
                   <select
                     value={settings.defaultBufferAfter}
                     onChange={(e) => updateSetting('defaultBufferAfter', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0分">なし</option>
                     <option value="10分">10分</option>

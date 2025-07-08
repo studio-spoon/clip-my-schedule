@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { Plus, X, UserPlus } from 'lucide-react'
+// 課金機能は開発中のため一時的にコメントアウト
+// import { useFeatureFlags } from '@/hooks/useFeatureFlags'
+// import FeatureGate from '@/components/FeatureGate'
 
 interface AddMemberFormProps {
   onAddMember: (email: string) => void
@@ -12,6 +15,8 @@ export default function AddMemberForm({ onAddMember, userDomain }: AddMemberForm
   const [isOpen, setIsOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  // 課金機能は開発中のため一時的にコメントアウト
+  // const featureFlags = useFeatureFlags()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

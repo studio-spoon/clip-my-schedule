@@ -13,7 +13,11 @@ import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleResults from '@/components/ScheduleResults';
 import DebugPanel from '@/components/DebugPanel';
 import Footer from '@/components/Footer';
+// 課金機能は開発中のため一時的にコメントアウト
+// import PricingBanner from '@/components/PricingBanner';
 import { Member } from '@/types/api';
+// import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+// import { usePricing } from '@/hooks/usePricing';
 
 function SchedulerContent() {
   // NextAuth.jsセッション管理
@@ -38,6 +42,9 @@ function SchedulerContent() {
   const scheduleState = useScheduleState(settings);
   const { availableSlots, isSearching, hasSearched, searchSchedule } =
     useScheduleSearch();
+  // 課金機能は開発中のため一時的にコメントアウト
+  // const featureFlags = useFeatureFlags();
+  // const { updateUsage } = usePricing();
 
   // セッション初期化とお気に入りメンバー自動選択
   useEffect(() => {
@@ -82,6 +89,15 @@ function SchedulerContent() {
   };
 
   const handleSearch = (forceRefresh = false) => {
+    // 課金機能は開発中のため制限チェックを一時的にコメントアウト
+    // if (!featureFlags.canPerformSearch) {
+    //   console.warn('Search limit reached');
+    //   return;
+    // }
+
+    // 使用量を更新
+    // updateUsage('search');
+
     // 検索履歴を記録
     addSearchHistory({
       participants: scheduleState.selectedMembers,
@@ -145,9 +161,17 @@ function SchedulerContent() {
   ]);
 
   const handleAddMember = async (member: Member) => {
+    // 課金機能は開発中のため制限チェックを一時的にコメントアウト
+    // if (!featureFlags.canAddNewMember) {
+    //   console.warn('Member limit reached');
+    //   return;
+    // }
+
     // 新しいメンバーをローカルに追加
     if (member.email) {
       await addManualMember(member.email);
+      // 使用量を更新
+      // updateUsage('member');
     }
   };
 
@@ -175,6 +199,9 @@ function SchedulerContent() {
         <div className='p-4 lg:p-8'>
           <div className='max-w-6xl mx-auto'>
             <AppHeader session={session} onLogout={handleLogout} />
+
+            {/* プライシングバナー - 開発中のため非表示 */}
+            {/* <PricingBanner /> */}
 
             {/* メインコンテンツ */}
             <div
