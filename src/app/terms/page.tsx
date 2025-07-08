@@ -1,30 +1,37 @@
+'use client';
+
 import Link from 'next/link';
 import { Calendar, ArrowLeft } from 'lucide-react';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/contexts/ThemeProvider';
 
 export default function TermsPage() {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
-      <div className='container mx-auto px-4 py-8 max-w-4xl'>
+    <ThemeProvider>
+      <div className='min-h-screen' style={{background: 'var(--gradient-background)'}}>
+        <div className='container mx-auto px-4 py-8 max-w-4xl'>
         {/* ヘッダー */}
         <div className='mb-8'>
           <Link
             href='/app'
-            className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4'
+            className='inline-flex items-center gap-2 mb-4 transition-colors'
+            style={{color: 'var(--primary)'}}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--primary-hover)'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--primary)'}
           >
             <ArrowLeft className='w-4 h-4' />
             アプリに戻る
           </Link>
 
           <div className='flex items-center gap-4 mb-6'>
-            <div className='p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg'>
-              <Calendar className='w-8 h-8 text-white' />
+            <div className='p-3 rounded-xl' style={{background: 'var(--gradient-primary)', boxShadow: 'var(--shadow-lg)'}}>
+              <Calendar className='w-8 h-8' style={{color: 'var(--primary-foreground)'}} />
             </div>
             <div>
-              <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+              <h1 className='text-3xl font-bold' style={{color: 'var(--foreground)'}}>
                 利用規約
               </h1>
-              <p className='text-gray-600 dark:text-gray-400'>
+              <p style={{color: 'var(--muted-foreground)'}}>
                 Time Clipper Terms of Service
               </p>
             </div>
@@ -32,8 +39,8 @@ export default function TermsPage() {
         </div>
 
         {/* コンテンツ */}
-        <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 prose max-w-none'>
-          <p className='text-sm text-gray-500 dark:text-gray-400 mb-8'>
+        <div className='rounded-2xl p-4 md:p-8 prose max-w-none' style={{backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-xl)'}}>
+          <p className='text-sm mb-8' style={{color: 'var(--muted-foreground)'}}>
             最終更新日: 2025年7月5日
           </p>
 
@@ -128,13 +135,14 @@ export default function TermsPage() {
             本規約の解釈にあたっては、日本法を準拠法とします。本サービスに関して紛争が生じた場合には、当社の本店所在地を管轄する裁判所を専属的合意管轄とします。
           </p>
 
-          <div className='mt-12 pt-8 border-t border-gray-200 dark:border-gray-700'>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>以上</p>
+          <div className='mt-12 pt-8' style={{borderTop: '1px solid var(--border)'}}>
+            <p className='text-sm' style={{color: 'var(--muted-foreground)'}}>以上</p>
           </div>
         </div>
         
-        <Footer />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }

@@ -17,26 +17,31 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function LandingPage() {
+
+function LandingPageContent() {
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{background: 'var(--background)', color: 'var(--foreground)'}}>
       {/* ヘッダー */}
-      <header className="border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b backdrop-blur-sm sticky top-0 z-50" style={{borderColor: 'var(--border)', backgroundColor: 'var(--card)/95'}}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Time Clipper</span>
+              <span className="text-xl font-bold" style={{color: 'var(--foreground)'}}>Time Clipper</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">機能</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">料金</a>
-              <a href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+              <a href="#features" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>機能</a>
+              <a href="#pricing" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>料金</a>
+              <a href="#faq" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>FAQ</a>
               <Link 
                 href="/app"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 rounded-lg transition-colors"
+                style={{backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)'}}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = 'var(--primary-hover)'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'var(--primary)'}
               >
                 アプリを開く
               </Link>
@@ -571,6 +576,14 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <div className="light-theme">
+      <LandingPageContent />
     </div>
   );
 }

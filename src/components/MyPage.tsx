@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Settings, Save, RotateCcw, Download, Upload, History, Star, Clock, Sun, Moon, Laptop, ArrowLeft } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useThemeContext } from '@/contexts/ThemeProvider';
 import UserAvatar from '@/components/UserAvatar';
 
 export default function MyPage() {
@@ -21,6 +22,15 @@ export default function MyPage() {
     exportSettings,
     importSettings,
   } = useUserSettings();
+  
+  const { themeMode, setThemeMode, systemTheme } = useThemeContext();
+  
+  // Sync themeMode with userSettings on mount
+  React.useEffect(() => {
+    if (settings.theme && settings.theme !== themeMode) {
+      setThemeMode(settings.theme);
+    }
+  }, [settings.theme, themeMode, setThemeMode]);
 
   const [activeTab, setActiveTab] = useState<'general' | 'favorites' | 'history'>('general');
   const [importError, setImportError] = useState<string | null>(null);
@@ -278,18 +288,29 @@ export default function MyPage() {
                     ].map(({ value, label, icon: Icon }) => (
                       <button
                         key={value}
-                        onClick={() => updateSetting('theme', value as 'light' | 'dark' | 'system')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
-                          settings.theme === value
+                        onClick={() => {
+                          setThemeMode(value as 'light' | 'dark' | 'system');
+                          updateSetting('theme', value as 'light' | 'dark' | 'system');
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                          themeMode === value
                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                             : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
-                        {label}
+                        <span>{label}</span>
+                        {value === 'system' && (
+                          <span className="text-xs opacity-60">
+                            ({systemTheme === 'dark' ? 'ダーク' : 'ライト'})
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    システムテーマはブラウザの設定に従います
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-3">

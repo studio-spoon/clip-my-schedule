@@ -178,10 +178,10 @@ function SchedulerContent() {
   // ローディング画面
   if (isLoading) {
     return (
-      <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center' style={{background: 'var(--gradient-background)'}}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4'></div>
-          <p className='text-gray-600 dark:text-gray-400'>読み込み中...</p>
+          <p style={{color: 'var(--muted-foreground)'}}>読み込み中...</p>
         </div>
       </div>
     );
@@ -195,7 +195,7 @@ function SchedulerContent() {
   // メインアプリケーション（ログイン後）
   return (
     <div className='min-h-screen transition-colors duration-200'>
-      <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200'>
+      <div className='min-h-screen transition-colors duration-200' style={{background: 'var(--gradient-background)'}}>
         <div className='p-4 lg:p-8'>
           <div className='max-w-6xl mx-auto'>
             <AppHeader session={session} onLogout={handleLogout} />
@@ -205,9 +205,12 @@ function SchedulerContent() {
 
             {/* メインコンテンツ */}
             <div
-              className='bg-white dark:bg-gray-800 rounded-2xl 
-  shadow-xl border border-gray-200 dark:border-gray-700 p-4 
-  md:p-8 backdrop-blur-sm'
+              className='rounded-2xl p-4 md:p-8 backdrop-blur-sm'
+              style={{
+                backgroundColor: 'var(--card)',
+                border: `1px solid var(--border)`,
+                boxShadow: 'var(--shadow-xl)'
+              }}
             >
               <MemberSelection
                 teamMembers={teamMembers}
@@ -276,4 +279,10 @@ function SchedulerContent() {
   );
 }
 
-export default SchedulerContent;
+export default function Scheduler() {
+  return (
+    <div className="dark-theme">
+      <SchedulerContent />
+    </div>
+  );
+}

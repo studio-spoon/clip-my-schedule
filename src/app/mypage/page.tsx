@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import MyPage from '@/components/MyPage';
 import LoginForm from '@/components/LoginForm';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/contexts/ThemeProvider';
 
 export default function MyPagePage() {
   const { data: session, status } = useSession();
@@ -38,11 +39,13 @@ export default function MyPagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        <MyPage />
+    <ThemeProvider>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 py-8">
+          <MyPage />
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </ThemeProvider>
   );
 }

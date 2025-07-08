@@ -1,30 +1,37 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/contexts/ThemeProvider';
 
 export default function PrivacyPage() {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
-      <div className='container mx-auto px-4 py-8 max-w-4xl'>
+    <ThemeProvider>
+      <div className='min-h-screen' style={{background: 'var(--gradient-background)'}}>
+        <div className='container mx-auto px-4 py-8 max-w-4xl'>
         {/* ヘッダー */}
         <div className='mb-8'>
           <Link
             href='/app'
-            className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4'
+            className='inline-flex items-center gap-2 mb-4 transition-colors'
+            style={{color: 'var(--primary)'}}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--primary-hover)'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--primary)'}
           >
             <ArrowLeft className='w-4 h-4' />
             アプリに戻る
           </Link>
 
           <div className='flex items-center gap-4 mb-6'>
-            <div className='p-3 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl shadow-lg'>
-              <Shield className='w-8 h-8 text-white' />
+            <div className='p-3 rounded-xl' style={{background: 'linear-gradient(135deg, var(--success) 0%, var(--info) 100%)', boxShadow: 'var(--shadow-lg)'}}>
+              <Shield className='w-8 h-8' style={{color: 'var(--primary-foreground)'}} />
             </div>
             <div>
-              <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+              <h1 className='text-3xl font-bold' style={{color: 'var(--foreground)'}}>
                 プライバシーポリシー
               </h1>
-              <p className='text-gray-600 dark:text-gray-400'>
+              <p style={{color: 'var(--muted-foreground)'}}>
                 Time Clipper Privacy Policy
               </p>
             </div>
@@ -32,8 +39,8 @@ export default function PrivacyPage() {
         </div>
 
         {/* コンテンツ */}
-        <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 prose max-w-none'>
-          <p className='text-sm text-gray-500 dark:text-gray-400 mb-8'>
+        <div className='rounded-2xl p-4 md:p-8 prose max-w-none' style={{backgroundColor: 'var(--card)', boxShadow: 'var(--shadow-xl)'}}>
+          <p className='text-sm mb-8' style={{color: 'var(--muted-foreground)'}}>
             最終更新日: 2025年7月5日
           </p>
 
@@ -142,7 +149,7 @@ export default function PrivacyPage() {
           <p>
             個人情報の取り扱いに関するお問い合わせは、以下までご連絡ください：
           </p>
-          <div className='bg-gray-50 dark:bg-gray-700 p-4 rounded-lg'>
+          <div className='p-4 rounded-lg' style={{backgroundColor: 'var(--muted)'}}>
             <p>
               <strong>STUDIO SPOON</strong>
               <br />
@@ -151,7 +158,8 @@ export default function PrivacyPage() {
                 href='https://studio-spoon.co.jp/'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-600 dark:text-blue-400 hover:underline'
+                className='hover:underline transition-colors'
+                style={{color: 'var(--primary)'}}
               >
                 https://studio-spoon.co.jp/
               </a>
@@ -163,13 +171,14 @@ export default function PrivacyPage() {
             当社は、必要に応じて本プライバシーポリシーを変更する場合があります。重要な変更については、本サービス上で事前に通知いたします。
           </p>
 
-          <div className='mt-12 pt-8 border-t border-gray-200 dark:border-gray-700'>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>以上</p>
+          <div className='mt-12 pt-8' style={{borderTop: '1px solid var(--border)'}}>
+            <p className='text-sm' style={{color: 'var(--muted-foreground)'}}>以上</p>
           </div>
         </div>
         
-        <Footer />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
