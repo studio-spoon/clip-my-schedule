@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { Calendar, ArrowLeft } from 'lucide-react';
 import Footer from '@/components/Footer';
-import { ThemeProvider } from '@/contexts/ThemeProvider';
 
 export default function TermsPage() {
   return (
-    <ThemeProvider>
+    <div className="dark-theme">
       <div className='min-h-screen' style={{background: 'var(--gradient-background)'}}>
         <div className='container mx-auto px-4 py-8 max-w-4xl'>
         {/* ヘッダー */}
@@ -143,6 +142,6 @@ export default function TermsPage() {
           <Footer />
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }

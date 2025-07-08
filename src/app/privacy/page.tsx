@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 import Footer from '@/components/Footer';
-import { ThemeProvider } from '@/contexts/ThemeProvider';
 
 export default function PrivacyPage() {
   return (
-    <ThemeProvider>
+    <div className="dark-theme">
       <div className='min-h-screen' style={{background: 'var(--gradient-background)'}}>
         <div className='container mx-auto px-4 py-8 max-w-4xl'>
         {/* ヘッダー */}
@@ -179,6 +178,6 @@ export default function PrivacyPage() {
           <Footer />
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }
