@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 export default function PrivacyPage() {
   return (
@@ -8,7 +9,7 @@ export default function PrivacyPage() {
         {/* ヘッダー */}
         <div className='mb-8'>
           <Link
-            href='/'
+            href='/app'
             className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4'
           >
             <ArrowLeft className='w-4 h-4' />
@@ -164,20 +165,10 @@ export default function PrivacyPage() {
 
           <div className='mt-12 pt-8 border-t border-gray-200 dark:border-gray-700'>
             <p className='text-sm text-gray-600 dark:text-gray-400'>以上</p>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mt-4'>
-              © 2025{' '}
-              <a
-                href='https://studio-spoon.co.jp/'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-600 dark:text-blue-400 hover:underline'
-              >
-                STUDIO SPOON
-              </a>
-              . All rights reserved.
-            </p>
           </div>
         </div>
+        
+        <Footer />
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     locale: 'ja_JP',
     url: 'https://time-clipper.netlify.app',
     title: 'Time Clipper - スケジュール調整を簡単に',
-    description: 'Googleカレンダー連携でチームの空き時間を瞬時に検索。会議設定、打ち合わせ調整を効率化するスケジュール調整ツール。',
+    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと把握。メールやりとりにおける会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリです。',
     siteName: 'Time Clipper',
     images: [
       {
