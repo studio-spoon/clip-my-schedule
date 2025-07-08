@@ -1,48 +1,48 @@
 # Time Clipper
 
-**The smart way to find perfect meeting times**
+**完璧な会議時間を見つけるスマートな方法**
 
-Effortlessly coordinate schedules with Google Calendar integration. Find available time slots for your team in seconds, not hours.
+Google Calendar連携でスケジュール調整を簡単に。チームの空き時間を数秒で発見できます。
 
-[🚀 **Try it now**](https://time-clipper.netlify.app/) • [💡 **Learn more**](#features)
-
----
-
-## ✨ Features
-
-**🔐 Google OAuth Authentication**  
-Secure login with any Google account
-
-**📅 Smart Schedule Search**  
-Find available time slots across multiple team members instantly
-
-**🎨 Beautiful Interface**  
-Clean, responsive design with light/dark mode support
-
-**📋 Export Results**  
-Copy and share available time slots with a single click
-
-**⚙️ Flexible Settings**  
-Customize time ranges, duration, and buffer times
+[🚀 **今すぐ試す**](https://time-clipper.netlify.app/) • [💡 **詳細を見る**](#features)
 
 ---
 
-## 🚀 Quick Start
+## ✨ 機能
 
-### Live Demo
-Visit [time-clipper.netlify.app](https://time-clipper.netlify.app/) to try it instantly.
+**🔐 Google OAuth認証**  
+任意のGoogleアカウントでセキュアにログイン
 
-### Local Development
+**📅 スマートスケジュール検索**  
+複数のチームメンバーの空き時間を瞬時に発見
+
+**🎨 美しいインターフェース**  
+ライト/ダークモード対応のクリーンでレスポンシブなデザイン
+
+**📋 結果のエクスポート**  
+空き時間をワンクリックでコピー・共有
+
+**⚙️ 柔軟な設定**  
+時間範囲、期間、バッファー時間をカスタマイズ可能
+
+---
+
+## 🚀 クイックスタート
+
+### ライブデモ
+[time-clipper.netlify.app](https://time-clipper.netlify.app/)で今すぐお試しください。
+
+### ローカル開発
 
 ```bash
-# Install dependencies
+# 依存関係のインストール
 npm install
 
-# Start development server
+# 開発サーバーの起動
 npm run dev
 ```
 
-Set up your `.env.local`:
+`.env.local`を設定:
 ```env
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -52,32 +52,32 @@ NEXTAUTH_SECRET=your_nextauth_secret
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ 技術スタック
 
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Modern styling
-- **NextAuth.js** - Authentication
-- **Google APIs** - Calendar integration
-
----
-
-## 💡 How It Works
-
-1. **Sign in** with your Google account
-2. **Select** team members to include
-3. **Set** your preferred time range and duration
-4. **Get** available time slots instantly
-5. **Share** results with your team
+- **Next.js 15** - App Router対応のReactフレームワーク
+- **TypeScript** - 型安全な開発
+- **Tailwind CSS** - モダンなスタイリング
+- **NextAuth.js** - 認証機能
+- **Google APIs** - カレンダー連携
 
 ---
 
-## 🤝 Contributing
+## 💡 使い方
 
-Built with ❤️ by [STUDIO SPOON](https://studio-spoon.co.jp/)
-
-Questions or feedback? Open an issue or reach out to our team.
+1. **サインイン** - Googleアカウントでログイン
+2. **選択** - 含めるチームメンバーを選択
+3. **設定** - 希望の時間範囲と期間を設定
+4. **取得** - 空き時間を瞬時に表示
+5. **共有** - 結果をチームと共有
 
 ---
 
-*Making meeting coordination simple, one schedule at a time.*
+## 🤝 貢献
+
+❤️ [STUDIO SPOON](https://studio-spoon.co.jp/) によって制作
+
+質問やフィードバックは、issueを開くかチームまでお気軽にお声かけください。
+
+---
+
+*会議調整をシンプルに、一つずつスケジュールを整理します。*
