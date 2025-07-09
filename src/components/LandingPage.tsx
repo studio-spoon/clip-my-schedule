@@ -148,13 +148,13 @@ function LandingPageContent() {
               Time ClipperはGoogleカレンダーと連携し、<br />チーム全員の空き時間を自動で探し出す、<br className="sm:hidden" />新しいスケジュール調整ツールです。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
-              <button 
-                onClick={showComingSoon}
+              <Link
+                href="/app"
                 className="bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="whitespace-nowrap">Googleアカウントで無料で始める</span>
-              </button>
+              </Link>
             </div>
             <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4 px-4 sm:px-0">
               クレジットカード不要 • 3分で開始 • <br className="sm:hidden" />無料プランでずっと利用可能
