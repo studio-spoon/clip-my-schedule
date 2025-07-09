@@ -218,7 +218,7 @@ export default function ScheduleForm({
         </div>
 
         {selectedTimeSlot === '時間指定' && (
-          <div className='flex flex-col sm:flex-row gap-3 items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600'>
+          <div className='flex flex-row gap-3 items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600'>
             <div className='flex items-center gap-1'>
               <div className='relative'>
                 <select
