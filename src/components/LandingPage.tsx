@@ -45,6 +45,57 @@ function LandingPageContent() {
     alert('現在準備中です。しばらくお待ちください。');
   };
 
+  // iOS Safari対応のレガシークリップボードコピー
+  const copyToClipboardLegacy = (text: string, button: HTMLElement, originalText: string | null) => {
+    try {
+      // 一時的なテキストエリアを作成
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      textArea.style.opacity = '0';
+      textArea.style.pointerEvents = 'none';
+      textArea.setAttribute('readonly', 'readonly');
+      document.body.appendChild(textArea);
+      
+      // iOS特有の選択範囲設定
+      if (navigator.userAgent.match(/ipad|iphone/i)) {
+        textArea.contentEditable = 'true';
+        textArea.readOnly = false;
+        const range = document.createRange();
+        range.selectNodeContents(textArea);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        textArea.setSelectionRange(0, 999999);
+      } else {
+        textArea.focus();
+        textArea.select();
+      }
+      
+      // コピー実行
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      // 元のボタンにフォーカスを戻す
+      button.focus();
+      
+      if (successful) {
+        button.textContent = 'お問い合わせ先のメールアドレスをコピーしました！';
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      } else {
+        // 最終フォールバック：アラートでメールアドレスを表示
+        alert(`お問い合わせ先メールアドレス: ${text}`);
+      }
+    } catch {
+      // 最終フォールバック：アラートでメールアドレスを表示
+      alert(`お問い合わせ先メールアドレス: ${text}`);
+    }
+  };
+
   return (
     <div className="min-h-screen" style={{background: 'var(--background)', color: 'var(--foreground)'}}>
       {/* ヘッダー */}
@@ -596,15 +647,29 @@ function LandingPageContent() {
                 <li><a href="#faq" onClick={(e) => scrollToSection('faq', e)} className="hover:text-white transition-colors">FAQ</a></li>
                 <li>
                   <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText('info@studio-spoon.co.jp');
-                      // 簡単なフィードバック表示（オプション）
-                      const button = document.activeElement as HTMLElement;
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      
+                      const copyText = 'info@studio-spoon.co.jp';
+                      const button = e.currentTarget as HTMLElement;
                       const originalText = button.textContent;
-                      button.textContent = 'お問い合わせ先のメールアドレスをコピーしました！';
-                      setTimeout(() => {
-                        button.textContent = originalText;
-                      }, 2000);
+                      
+                      // モダンブラウザのClipboard API
+                      if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(copyText).then(() => {
+                          button.textContent = 'お問い合わせ先のメールアドレスをコピーしました！';
+                          setTimeout(() => {
+                            button.textContent = originalText;
+                          }, 2000);
+                        }).catch(() => {
+                          // フォールバック
+                          copyToClipboardLegacy(copyText, button, originalText);
+                        });
+                      } else {
+                        // iOS Safari などの古いブラウザ用フォールバック
+                        copyToClipboardLegacy(copyText, button, originalText);
+                      }
                     }}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
