@@ -31,18 +31,35 @@ function LandingPageContent() {
     }
   };
 
+  // ページトップにスクロール
+  const scrollToTop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // 準備中メッセージを表示
+  const showComingSoon = (e: React.MouseEvent) => {
+    e.preventDefault();
+    alert('準備中です。しばらくお待ちください。');
+  };
+
   return (
     <div className="min-h-screen" style={{background: 'var(--background)', color: 'var(--foreground)'}}>
       {/* ヘッダー */}
       <header className="border-b backdrop-blur-sm sticky top-0 z-50" style={{borderColor: 'var(--border)', backgroundColor: 'var(--card)/95'}}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-white" />
+            <a href="#top" onClick={scrollToTop}>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold" style={{color: 'var(--foreground)'}}>Time Clipper</span>
               </div>
-              <span className="text-xl font-bold" style={{color: 'var(--foreground)'}}>Time Clipper</span>
-            </div>
+            </a>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#features" onClick={(e) => scrollToSection('features', e)} className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>機能</a>
               <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>料金</a>
@@ -78,13 +95,13 @@ function LandingPageContent() {
               Time ClipperはGoogleカレンダーと連携し、チーム全員の空き時間を自動で探し出す、新しいスケジュール調整ツールです。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                href="/app"
+              <button 
+                onClick={showComingSoon}
                 className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
               >
                 <Calendar className="w-5 h-5" />
                 Googleアカウントで無料で試す
-              </Link>
+              </button>
             </div>
             <p className="text-sm text-gray-500 mt-4">
               クレジットカード不要 • 3分で開始 • 無料プランでずっと利用可能
@@ -399,12 +416,12 @@ function LandingPageContent() {
                   <span>優先メールサポート</span>
                 </li>
               </ul>
-              <Link
-                href="/app"
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center block"
+              <button
+                onClick={showComingSoon}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center cursor-pointer"
               >
                 14日間無料で試す
-              </Link>
+              </button>
             </div>
 
             {/* Enterpriseプラン */}
@@ -433,7 +450,10 @@ function LandingPageContent() {
                   <span>専任担当者サポート</span>
                 </li>
               </ul>
-              <button className="w-full bg-gray-900 text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+              <button 
+                onClick={showComingSoon}
+                className="w-full bg-gray-900 text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+              >
                 資料請求・相談
               </button>
             </div>
@@ -545,12 +565,13 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" />
+              <a href="#top" onClick={scrollToTop}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-white" />
+                  </div><span className="text-xl font-bold">Time Clipper</span>
                 </div>
-                <span className="text-xl font-bold">Time Clipper</span>
-              </div>
+              </a>
               <p className="text-gray-400">
                 面倒な日程調整を一瞬で解決するスケジュール調整ツール
               </p>
