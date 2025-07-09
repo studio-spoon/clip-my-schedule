@@ -139,15 +139,17 @@ export default function MemberSelection({
     }
   };
   return (
-    <div className='mb-8'>
-      <div className='flex items-center gap-3 mb-4'>
-        <div className='p-2 bg-blue-100 dark:bg-blue-900 rounded-lg'>
-          <Users className='w-5 h-5 text-blue-600 dark:text-blue-400' />
+    <div className='mb-6 md:mb-8'>
+      <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 md:mb-4'>
+        <div className='flex items-center gap-3'>
+          <div className='p-2 bg-blue-100 dark:bg-blue-900 rounded-lg'>
+            <Users className='w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400' />
+          </div>
+          <h2 className='text-lg sm:text-xl font-semibold text-gray-900 dark:text-white'>
+            参加者を選択
+          </h2>
         </div>
-        <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
-          参加者を選択
-        </h2>
-        <span className='text-sm text-gray-500 dark:text-gray-400'>
+        <span className='text-sm text-gray-500 dark:text-gray-400 sm:ml-auto'>
           {isLoading ? '読み込み中...' : `${teamMembers.length}名から選択可能`}
         </span>
       </div>

@@ -13,7 +13,7 @@ interface AppHeaderProps {
 export default function AppHeader({ session, onLogout }: AppHeaderProps) {
 
   return (
-    <div className='mb-6 md:mb-8'>
+    <div className='mb-4 md:mb-6 lg:mb-8'>
       {/* デスクトップレイアウト */}
       <div className='hidden md:flex items-center justify-between'>
         <div className='flex items-center gap-4'>
@@ -90,13 +90,13 @@ export default function AppHeader({ session, onLogout }: AppHeaderProps) {
       {/* モバイルレイアウト */}
       <div className='md:hidden'>
         {/* モバイルヘッダー行1: タイトルとユーザーアバター */}
-        <div className='flex items-center justify-between mb-3'>
-          <div className='flex items-center gap-3'>
-            <div className='p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg'>
-              <Calendar className='w-6 h-6 text-white' />
+        <div className='flex items-center justify-between mb-2 sm:mb-3'>
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='p-1.5 sm:p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg'>
+              <Calendar className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
             </div>
             <div>
-              <h1 className='text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent'>
+              <h1 className='text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent'>
                 Time Clipper
               </h1>
             </div>

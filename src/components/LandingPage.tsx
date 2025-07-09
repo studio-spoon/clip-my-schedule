@@ -11,7 +11,6 @@ import {
   Shield,
   Zap,
   Target,
-  ChevronDown,
   Mail,
   Building
 } from 'lucide-react';
@@ -43,7 +42,7 @@ function LandingPageContent() {
   // 準備中メッセージを表示
   const showComingSoon = (e: React.MouseEvent) => {
     e.preventDefault();
-    alert('準備中です。しばらくお待ちください。');
+    alert('現在準備中です。しばらくお待ちください。');
   };
 
   return (
@@ -71,40 +70,44 @@ function LandingPageContent() {
                 onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = 'var(--primary-hover)'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'var(--primary)'}
               >
-                アプリを開く
+                無料で始める
               </Link>
             </nav>
-            <button className="md:hidden p-2">
-              <ChevronDown className="w-5 h-5" />
-            </button>
+            <Link 
+              href="/app"
+              className="md:hidden px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              無料で始める
+            </Link>
           </div>
         </div>
       </header>
 
       {/* ヒーローセクション */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-20">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              面倒な日程調整を、
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+              面倒な日程調整を<span className="hidden sm:inline">、</span>
+              <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 一瞬で
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto px-4 sm:px-0">
               Time ClipperはGoogleカレンダーと連携し、チーム全員の空き時間を自動で探し出す、新しいスケジュール調整ツールです。
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
               <button 
                 onClick={showComingSoon}
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                className="bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <Calendar className="w-5 h-5" />
-                Googleアカウントで無料で試す
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">Googleアカウントで無料で始める</span>
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-4">
-              クレジットカード不要 • 3分で開始 • 無料プランでずっと利用可能
+            <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4 px-4 sm:px-0">
+              クレジットカード不要 • 3分で開始 • <br className="sm:hidden" />無料プランでずっと利用可能
             </p>
           </div>
 
@@ -163,30 +166,30 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              こんな日程調整に、時間を奪われていませんか？
+              こんな日程調整、<br className="sm:hidden" />ありませんか？
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 icon: Mail,
-                title: "延々と続くメール",
+                title: "メールでの日程調整",
                 description: "候補日時のリストアップと返信待ちの繰り返し"
               },
               {
                 icon: Calendar,
-                title: "カレンダー地獄",
+                title: "カレンダーの見比べ",
                 description: "複数人のカレンダーを何度も見比べる手間"
               },
               {
                 icon: Users,
-                title: "調整ミス",
-                description: "「言った言わない」の調整ミス"
+                title: "調整の不一致",
+                description: "揃ったと思ったら、誰かの予定が入った"
               },
               {
                 icon: Clock,
-                title: "時間の無駄",
-                description: "急な予定変更による再調整の煩わしさ"
+                title: "モヤモヤ感",
+                description: "調整に時間がかかり、イライラすることも"
               }
             ].map((problem, index) => (
               <div key={index} className="text-center">
@@ -202,14 +205,14 @@ function LandingPageContent() {
       </section>
 
       {/* 解決策セクション */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-12 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Time Clipperが、そのすべてを解決します
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 px-4 sm:px-0">
+              Time Clipperが<span className="hidden sm:inline">、</span><br className="sm:hidden" />そのすべてを解決します
             </h2>
-            <p className="text-xl text-gray-600">
-              シンプルな3ステップで、面倒な日程調整が一瞬で完了
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">
+              シンプルな3ステップで、<br className="sm:hidden" />面倒な日程調整が一瞬で完了
             </p>
           </div>
 
@@ -219,7 +222,11 @@ function LandingPageContent() {
                 step: "1",
                 title: "連携",
                 subtitle: "Connect",
-                description: "Googleアカウントでログインするだけ。面倒な初期設定は不要。",
+                description: (
+                  <>
+                    Googleアカウントでログインするだけ。<br className="sm:hidden" />面倒な初期設定は不要。
+                  </>
+                ),
                 icon: Shield,
                 color: "from-blue-500 to-blue-600"
               },
@@ -295,7 +302,7 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              あなたのチームに、もっと価値ある時間を
+              あなたのチームに、<br className="sm:hidden" />もっと価値ある時間を
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -310,14 +317,14 @@ function LandingPageContent() {
               {
                 icon: Target,
                 title: "生産性の高い業務に集中",
-                description: "ノンコア業務から解放され、重要な仕事に専念",
+                description: (<>ノンコア業務から解放され、<br className="sm:hidden" />重要な仕事に専念</>),
                 stat: "3x",
                 unit: "効率UP"
               },
               {
                 icon: Users,
-                title: "スムーズな連携でチームワーク向上",
-                description: "迅速な日程調整でプロジェクトの始動を加速",
+                title: (<>スムーズな連携で<br className="sm:hidden" />チームワーク向上</>),
+                description: (<>迅速な日程調整で<br className="sm:hidden" />プロジェクトの始動を加速</>),
                 stat: "100%",
                 unit: "満足度"
               }
@@ -339,25 +346,25 @@ function LandingPageContent() {
       </section>
 
       {/* 料金プランセクション */}
-      <section id="pricing" className="py-20">
+      <section id="pricing" className="py-12 md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 px-4 sm:px-0">
               シンプルで明確な料金体系
             </h2>
-            <p className="text-xl text-gray-600">
-              すべてのプランで14日間の無料トライアル付き
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">
+              すべてのプランで<br className="sm:hidden" />14日間の無料トライアル付き
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* 無料プラン */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">無料</h3>
-                <p className="text-gray-600 mb-4">個人・3名以下のチーム向け</p>
-                <div className="text-4xl font-bold text-gray-900">¥0</div>
-                <div className="text-gray-500">/ 月</div>
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 md:p-8">
+              <div className="text-center mb-6 md:mb-8">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">無料</h3>
+                <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">個人・3名以下のチーム向け</p>
+                <div className="text-3xl md:text-4xl font-bold text-gray-900">¥0</div>
+                <div className="text-sm md:text-base text-gray-500">/ 月</div>
               </div>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center gap-3">
@@ -420,7 +427,7 @@ function LandingPageContent() {
                 onClick={showComingSoon}
                 className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center cursor-pointer"
               >
-                14日間無料で試す
+                14日間無料で始める
               </button>
             </div>
 
@@ -466,7 +473,7 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              安心・安全にご利用いただけます
+              安心・安全に<br className="sm:hidden" />ご利用いただけます
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -475,21 +482,21 @@ function LandingPageContent() {
                 <Shield className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">セキュリティ</h3>
-              <p className="text-gray-600">Googleの安全なOAuth認証を利用。カレンダー情報の保存・変更は一切行いません。</p>
+              <p className="text-gray-600">Googleの安全なOAuth認証を利用。<br className="sm:hidden" />カレンダー情報の保存・変更は一切行いません。</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Building className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">運営会社</h3>
-              <p className="text-gray-600"><a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">STUDIO SPOON</a> による開発・運営。プライバシーポリシー完備。</p>
+              <p className="text-gray-600"><a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">STUDIO SPOON</a> による開発・運営。<br className="sm:hidden" />プライバシーポリシー完備。</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Star className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">サポート</h3>
-              <p className="text-gray-600">充実したドキュメントとメールサポート。不明な点はお気軽にお問い合わせください。</p>
+              <p className="text-gray-600">充実したドキュメントとメールサポート。<br className="sm:hidden" />不明な点はお気軽にお問い合わせください。</p>
             </div>
           </div>
         </div>
@@ -539,10 +546,10 @@ function LandingPageContent() {
       <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            今すぐ、面倒な日程調整から解放されましょう
+            今すぐ面倒な日程調整から<br className="sm:hidden" />解放されましょう
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Time Clipperで、あなたのチームの生産性を劇的に向上させてください
+            Time Clipperで、<br className="sm:hidden" />スケジュール調整をサッと！
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
@@ -555,7 +562,7 @@ function LandingPageContent() {
             </Link>
           </div>
           <p className="text-sm text-blue-100 mt-4">
-            3分で開始 • クレジットカード不要 • いつでもキャンセル可能
+            3分で開始 • クレジットカード不要 • <br className="sm:hidden" />いつでもキャンセル可能
           </p>
         </div>
       </section>
@@ -573,7 +580,7 @@ function LandingPageContent() {
                 </div>
               </a>
               <p className="text-gray-400">
-                面倒な日程調整を一瞬で解決するスケジュール調整ツール
+                日程調整をササッと解決！<br className="sm:hidden" />スケジュール調整アプリ
               </p>
             </div>
             <div>

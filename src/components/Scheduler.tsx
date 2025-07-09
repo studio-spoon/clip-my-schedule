@@ -196,7 +196,7 @@ function SchedulerContent() {
   return (
     <div className='min-h-screen transition-colors duration-200'>
       <div className='min-h-screen transition-colors duration-200' style={{background: 'var(--gradient-background)'}}>
-        <div className='p-4 lg:p-8'>
+        <div className='p-2 sm:p-4 lg:p-8'>
           <div className='max-w-6xl mx-auto'>
             <AppHeader session={session} onLogout={handleLogout} />
 
@@ -205,7 +205,7 @@ function SchedulerContent() {
 
             {/* メインコンテンツ */}
             <div
-              className='rounded-2xl p-4 md:p-8 backdrop-blur-sm'
+              className='rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-8 backdrop-blur-sm'
               style={{
                 backgroundColor: 'var(--card)',
                 border: `1px solid var(--border)`,
