@@ -42,7 +42,7 @@ function LandingPageContent() {
   // 準備中メッセージを表示
   const showComingSoon = (e: React.MouseEvent) => {
     e.preventDefault();
-    alert('現在準備中です。しばらくお待ちください。');
+    alert('すみません！　現在準備中です。しばらくお待ちください。');
   };
 
   // iOS Safari対応のレガシークリップボードコピー
@@ -146,7 +146,7 @@ function LandingPageContent() {
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto px-4 sm:px-0">
-              Time ClipperはGoogleカレンダーと連携し、チーム全員の空き時間を自動で探し出す、新しいスケジュール調整ツールです。
+              Time ClipperはGoogleカレンダーと連携し、<br />チーム全員の空き時間を自動で探し出す、新しいスケジュール調整ツールです。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
               <button 
@@ -225,22 +225,22 @@ function LandingPageContent() {
               {
                 icon: Mail,
                 title: "メールでの日程調整",
-                description: "候補日時のリストアップと返信待ちの繰り返し"
+                description: (<>候補日時のリストアップと<br />返信待ちの繰り返し</>)
               },
               {
                 icon: Calendar,
                 title: "カレンダーの見比べ",
-                description: "複数人のカレンダーを何度も見比べる手間"
+                description: (<>複数人のカレンダーを<br className="hidden sm:block" />何度も見比べる手間</>)
               },
               {
                 icon: Users,
                 title: "調整の不一致",
-                description: "揃ったと思ったら、誰かの予定が入った"
+                description: (<>揃ったと思ったら<span className="sm:hidden">、</span><br className="hidden sm:block" />誰かの予定が入った</>)
               },
               {
                 icon: Clock,
                 title: "モヤモヤ感",
-                description: "調整に時間がかかり、イライラすることも"
+                description:  (<>調整に時間がかかり<span className="sm:hidden">、</span><br className="hidden sm:block" />イライラすることも</>)
               }
             ].map((problem, index) => (
               <div key={index} className="text-center">
@@ -275,7 +275,7 @@ function LandingPageContent() {
                 subtitle: "Connect",
                 description: (
                   <>
-                    Googleアカウントでログインするだけ。<br className="sm:hidden" />面倒な初期設定は不要。
+                    Googleアカウントでログインするだけ。<br />面倒な初期設定は不要。
                   </>
                 ),
                 icon: Shield,
@@ -368,14 +368,14 @@ function LandingPageContent() {
               {
                 icon: Target,
                 title: "生産性の高い業務に集中",
-                description: (<>ノンコア業務から解放され、<br className="sm:hidden" />重要な仕事に専念</>),
+                description: (<>ノンコア業務から解放され、<br />重要な仕事に専念</>),
                 stat: "3x",
                 unit: "効率UP"
               },
               {
                 icon: Users,
                 title: (<>スムーズな連携で<br className="sm:hidden" />チームワーク向上</>),
-                description: (<>迅速な日程調整で<br className="sm:hidden" />プロジェクトの始動を加速</>),
+                description: (<>迅速な日程調整で<br />プロジェクトの始動を加速</>),
                 stat: "100%",
                 unit: "満足度"
               }
@@ -533,21 +533,21 @@ function LandingPageContent() {
                 <Shield className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">セキュリティ</h3>
-              <p className="text-gray-600">Googleの安全なOAuth認証を利用。<br className="sm:hidden" />カレンダー情報の保存・変更は一切行いません。</p>
+              <p className="text-gray-600">Googleの安全なOAuth認証を利用。<br />カレンダー情報の保存・変更は一切行いません。</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Building className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">運営会社</h3>
-              <p className="text-gray-600"><a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">STUDIO SPOON</a> による開発・運営。<br className="sm:hidden" />プライバシーポリシー完備。</p>
+              <p className="text-gray-600"><a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">STUDIO SPOON</a> による開発・運営。<br />プライバシーポリシー完備。</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Star className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">サポート</h3>
-              <p className="text-gray-600">充実したドキュメントとメールサポート。<br className="sm:hidden" />不明な点はお気軽にお問い合わせください。</p>
+              <p className="text-gray-600">充実したドキュメントとメールサポート。<br />不明な点はお気軽にお問い合わせください。</p>
             </div>
           </div>
         </div>
@@ -631,7 +631,7 @@ function LandingPageContent() {
                 </div>
               </a>
               <p className="text-gray-400">
-                日程調整をササッと解決！<br className="sm:hidden" />スケジュール調整アプリ
+                日程調整をササッと解決！<br />スケジュール調整アプリ
               </p>
             </div>
             <div>
