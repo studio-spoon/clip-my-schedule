@@ -451,7 +451,7 @@ function LandingPageContent() {
                 <Building className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">運営会社</h3>
-              <p className="text-gray-600">STUDIO SPOON による開発・運営。プライバシーポリシー完備。</p>
+              <p className="text-gray-600"><a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">STUDIO SPOON</a> による開発・運営。プライバシーポリシー完備。</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -556,7 +556,23 @@ function LandingPageContent() {
               <h4 className="font-semibold mb-4">サポート</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="mailto:support@time-clipper.com" className="hover:text-white transition-colors">お問い合わせ</a></li>
+                <li>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText('info@studio-spoon.co.jp');
+                      // 簡単なフィードバック表示（オプション）
+                      const button = document.activeElement as HTMLElement;
+                      const originalText = button.textContent;
+                      button.textContent = 'コピーしました！';
+                      setTimeout(() => {
+                        button.textContent = originalText;
+                      }, 2000);
+                    }}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
+                    お問い合わせ
+                  </button>
+                </li>
               </ul>
             </div>
             <div>
@@ -568,7 +584,7 @@ function LandingPageContent() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 STUDIO SPOON. All rights reserved.</p>
+            <p>&copy; 2025 <a href="https://studio-spoon.co.jp/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">STUDIO SPOON</a>. All rights reserved.</p>
           </div>
         </div>
       </footer>
