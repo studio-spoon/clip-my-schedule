@@ -5,7 +5,7 @@ import { Providers } from '@/components/Providers';
 export const metadata: Metadata = {
   title: 'Time Clipper - スケジュール調整を簡単に | 会議時間の空き時間検索ツール',
   description:
-    'Time Clipperは、Googleカレンダー連携でチームの空き時間を瞬時に検索できるスケジュール調整ツールです。会議設定、打ち合わせ調整、イベント企画を効率化。無料でご利用いただけます。',
+    'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
   keywords: [
     'スケジュール調整',
     '会議時間',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     locale: 'ja_JP',
     url: 'https://time-clipper.netlify.app',
     title: 'Time Clipper - スケジュール調整を簡単に',
-    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと把握。メールやりとりにおける会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリです。',
+    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
     siteName: 'Time Clipper',
     images: [
       {
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Time Clipper - スケジュール調整を簡単に',
-    description: 'Googleカレンダー連携でチームの空き時間を瞬時に検索。会議設定を効率化。',
+    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
     images: ['/ogimg.webp'],
     creator: '@studiospoon',
   },
@@ -91,7 +91,7 @@ export default function RootLayout({
               '@type': 'WebApplication',
               name: 'Time Clipper',
               url: 'https://time-clipper.netlify.app',
-              description: 'Googleカレンダー連携でチームの空き時間を瞬時に検索できるスケジュール調整ツール',
+              description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'All',
               offers: {

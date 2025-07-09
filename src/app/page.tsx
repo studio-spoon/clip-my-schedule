@@ -2,7 +2,7 @@ import LandingPage from '@/components/LandingPage';
 
 export const metadata = {
   title: 'Time Clipper - 日程調整を、一瞬で | スケジュール調整ツール',
-  description: 'Time ClipperはGoogleカレンダーと連携し、チーム全員の空き時間を自動で探し出すスケジュール調整ツール。会議の日程調整が90%時短できます。無料プランあり。',
+  description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
   keywords: [
     '日程調整',
     'スケジュール調整',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Time Clipper - 日程調整を、一瞬で',
-    description: 'Googleカレンダー連携でチーム全員の空き時間を自動検索。90%の時短を実現するスケジュール調整ツール。',
+    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
     type: 'website',
     url: 'https://time-clipper.netlify.app',
     images: [
@@ -32,7 +32,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Time Clipper - 日程調整を、一瞬で',
-    description: 'Googleカレンダー連携でチーム全員の空き時間を自動検索。90%の時短を実現。',
+    description: 'Googleカレンダー連携で自分とチームの空き時間をサッと出力。会議設定に活用できるプレーンテキストコピーで、打ち合わせ調整を効率化するWEBアプリ。',
     images: ['/og-landing.png'],
   },
 };
