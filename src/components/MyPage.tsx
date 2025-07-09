@@ -146,7 +146,7 @@ export default function MyPage() {
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{label}</span>
-              <span className="sm:hidden">{label.replace('基本', '').replace('お気に入り', '★').replace('履歴', '履')}</span>
+              <span className="sm:hidden">{label.replace('基本', '').replace('お気に入り', 'お気に入り').replace('履歴', '履歴')}</span>
             </button>
           ))}
         </nav>
