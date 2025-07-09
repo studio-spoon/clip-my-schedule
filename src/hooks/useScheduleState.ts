@@ -26,7 +26,7 @@ export function useScheduleState(userSettings?: UserSettings) {
   const [meetingDuration, setMeetingDuration] = useState('60分')
   const [bufferTimeBefore, setBufferTimeBefore] = useState('10分')
   const [bufferTimeAfter, setBufferTimeAfter] = useState('10分')
-  const [customDuration, setCustomDuration] = useState('75')
+  const [customDuration, setCustomDuration] = useState('90')
   const [customPeriodStart, setCustomPeriodStart] = useState('')
   const [customPeriodEnd, setCustomPeriodEnd] = useState('')
   const [isInitialized, setIsInitialized] = useState(false)

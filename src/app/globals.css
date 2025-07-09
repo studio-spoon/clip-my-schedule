@@ -257,6 +257,5 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Select element arrow spacing */
 select {
-  padding-right: 2.5rem !important;
   background-position: right 0.75rem center !important;
 }

@@ -74,10 +74,6 @@ function LandingPageContent() {
                 <Calendar className="w-5 h-5" />
                 Googleアカウントで無料で試す
               </Link>
-              <button className="border border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                <Star className="w-5 h-5" />
-                デモを見る
-              </button>
             </div>
             <p className="text-sm text-gray-500 mt-4">
               クレジットカード不要 • 3分で開始 • 無料プランでずっと利用可能
