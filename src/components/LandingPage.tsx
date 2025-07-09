@@ -139,8 +139,7 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
-              日程調整を<span className="sm:hidden">、</span>
-              <br className="sm:hidden" />
+              日程調整を<br className="sm:hidden" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 一瞬で
               </span>
