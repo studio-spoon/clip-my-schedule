@@ -259,3 +259,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 select {
   background-position: right 0.75rem center !important;
 }
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}

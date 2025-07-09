@@ -19,6 +19,17 @@ import Link from 'next/link';
 
 
 function LandingPageContent() {
+  // スムーズスクロール関数
+  const scrollToSection = (sectionId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{background: 'var(--background)', color: 'var(--foreground)'}}>
@@ -33,9 +44,9 @@ function LandingPageContent() {
               <span className="text-xl font-bold" style={{color: 'var(--foreground)'}}>Time Clipper</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>機能</a>
-              <a href="#pricing" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>料金</a>
-              <a href="#faq" className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>FAQ</a>
+              <a href="#features" onClick={(e) => scrollToSection('features', e)} className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>機能</a>
+              <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>料金</a>
+              <a href="#faq" onClick={(e) => scrollToSection('faq', e)} className="transition-colors" style={{color: 'var(--muted-foreground)'}} onMouseEnter={(e) => (e.target as HTMLElement).style.color = 'var(--foreground)'} onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'var(--muted-foreground)'}>FAQ</a>
               <Link 
                 href="/app"
                 className="px-4 py-2 rounded-lg transition-colors"
@@ -547,15 +558,14 @@ function LandingPageContent() {
             <div>
               <h4 className="font-semibold mb-4">プロダクト</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">機能</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">料金</a></li>
-                <li><Link href="/app" className="hover:text-white transition-colors">アプリ</Link></li>
+                <li><a href="#features" onClick={(e) => scrollToSection('features', e)} className="hover:text-white transition-colors">機能</a></li>
+                <li><a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="hover:text-white transition-colors">料金</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">サポート</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="#faq" onClick={(e) => scrollToSection('faq', e)} className="hover:text-white transition-colors">FAQ</a></li>
                 <li>
                   <button 
                     onClick={() => {
@@ -563,7 +573,7 @@ function LandingPageContent() {
                       // 簡単なフィードバック表示（オプション）
                       const button = document.activeElement as HTMLElement;
                       const originalText = button.textContent;
-                      button.textContent = 'コピーしました！';
+                      button.textContent = 'お問い合わせ先のメールアドレスをコピーしました！';
                       setTimeout(() => {
                         button.textContent = originalText;
                       }, 2000);
