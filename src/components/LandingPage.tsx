@@ -145,7 +145,7 @@ function LandingPageContent() {
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto px-4 sm:px-0">
-              Time ClipperはGoogleカレンダーと連携し、<br />チーム全員の空き時間を自動で探し出す、新しいスケジュール調整ツールです。
+              Time ClipperはGoogleカレンダーと連携し、<br />チーム全員の空き時間を自動で探し出す、<br className="sm:hidden" />新しいスケジュール調整ツールです。
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
               <button 
