@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: 'Time Clipper',
     images: [
       {
-        url: '/og-image.png',
+        url: '/ogimg.webp',
         width: 1200,
         height: 630,
         alt: 'Time Clipper - スケジュール調整ツール',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Time Clipper - スケジュール調整を簡単に',
     description: 'Googleカレンダー連携でチームの空き時間を瞬時に検索。会議設定を効率化。',
-    images: ['/og-image.png'],
+    images: ['/ogimg.webp'],
     creator: '@studiospoon',
   },
   robots: {
@@ -105,7 +105,7 @@ export default function RootLayout({
                 '会議時間設定',
                 'イベント企画サポート'
               ],
-              screenshot: 'https://time-clipper.netlify.app/og-image.png',
+              screenshot: 'https://time-clipper.netlify.app/ogimg.webp',
               aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: '4.8',
