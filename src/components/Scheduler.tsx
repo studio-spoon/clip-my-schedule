@@ -84,8 +84,10 @@ function SchedulerContent() {
 
   // ログアウト
   const handleLogout = () => {
-    scheduleState.clearAll();
-    signOut();
+    if (window.confirm('ログアウトしますか？\n\n現在の検索結果や設定は保持されます。')) {
+      scheduleState.clearAll();
+      signOut();
+    }
   };
 
   const handleSearch = (forceRefresh = false) => {
