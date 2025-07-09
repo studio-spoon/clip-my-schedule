@@ -139,8 +139,8 @@ function LandingPageContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
-              面倒な日程調整を<span className="hidden sm:inline">、</span>
-              <br className="hidden sm:block" />
+              日程調整を<span className="sm:hidden">、</span>
+              <br className="sm:hidden" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 一瞬で
               </span>
@@ -263,7 +263,7 @@ function LandingPageContent() {
               Time Clipperが<span className="hidden sm:inline">、</span><br className="sm:hidden" />そのすべてを解決します
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">
-              シンプルな3ステップで、<br className="sm:hidden" />面倒な日程調整が一瞬で完了
+              シンプルな3ステップで、<br className="sm:hidden" />日程調整が一瞬で完了
             </p>
           </div>
 
@@ -597,7 +597,7 @@ function LandingPageContent() {
       <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            今すぐ面倒な日程調整から<br className="sm:hidden" />解放されましょう
+            今すぐ日程調整から<br className="sm:hidden" />解放されましょう
           </h2>
           <p className="text-xl text-blue-100 mb-8">
             Time Clipperで、<br className="sm:hidden" />スケジュール調整をサッと！
