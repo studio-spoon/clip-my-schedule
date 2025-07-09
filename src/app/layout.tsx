@@ -46,6 +46,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  other: {
+    'og:image': '/ogimg.webp',
+  },
   twitter: {
     card: 'summary_large_image',
     title: 'Time Clipper - スケジュール調整を簡単に',
